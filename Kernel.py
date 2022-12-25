@@ -162,11 +162,38 @@ def single_point_crossover(parent: tuple):
 
 
 def crossover(count: int, probability: list):
+    """generate new generation with specific count
+
+    Args:
+        count (int): number of member of new generation
+        probability (list): list of odds ratio of each element
+
+    Returns:
+        list: new generation list
+    """
     generation = list()
     for _ in range(count):
         parent = selection(probability)
-        generation.append(single_point_crossover(parent))
+        child = single_point_crossover(parent)
+        child = mutation(child)
+        generation.append(child)
     return generation
+
+
+def mutation(genome: list, chance=0.5):
+    """mutaion over single chromosome
+
+    Args:
+        sloution (list): a certain chromosome
+        chance (float, optional): limitation of mutaion chance. Defaults to 0.5.
+
+    Returns:
+        list: mutated gene
+    """
+    for index in range(len(genome)):
+        genome[index] = genome[index] if random(
+        ) > chance else abs(genome[index] - 1)
+    return genome
 
 
 # read and clean information from csv file
@@ -187,3 +214,4 @@ population = initial_population(100, objects_number)
 
 probability = proportion(population, stuff, available_weight)
 generation = crossover(100, probability)
+print(generation)
