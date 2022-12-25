@@ -133,6 +133,20 @@ def roulette_wheel(probability: list):
             return thisTuple[1]
 
 
+def selection(probability:list):
+    """select the fittest sloution, they are select based on their fitness scores
+
+    Args:
+        probability (list): list of odds ratio of each element
+    
+    Returns:
+        tuple: selected parrent for goes to crossover
+    """
+    parent_1=roulette_wheel(probability)
+    parent_2=roulette_wheel(probability)
+    return parent_1,parent_2
+
+
 # read and clean information from csv file
 address = 'Myignore/test.csv'
 data = get_input(address)
