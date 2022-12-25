@@ -56,7 +56,7 @@ def initial_population(count: int, objects_number: int):
     return population
 
 
-def fitness(chromosome: list, objects: list, available_weight: float):
+def fitness(chromosome: list, stuff: list, available_weight: float):
     """The fitness function determines how fit an stuff is 
 
     Args:
@@ -69,11 +69,28 @@ def fitness(chromosome: list, objects: list, available_weight: float):
     """
     totalValue = totalWeight = index = 0
     while index < len(chromosome):
-        totalValue += chromosome[index]*objects[index][2]  # value of stuff
-        totalWeight += chromosome[index]*objects[index][1]  # weight of stuff
+        totalValue += chromosome[index]*stuff[index][2]  # value of stuff
+        totalWeight += chromosome[index]*stuff[index][1]  # weight of stuff
         index += 1
     return totalValue if available_weight >= totalWeight else 0
 
+
+def all_possibilities(generation: list, stuff: list, available_weight: float):
+    """Collect fitness of all items 
+
+    Args:
+        generation (list): whole sloution or Chromosomes of this generation
+        stuff (list): list of whole stuff
+        available_weight (float): maximum weight which backpack can carry
+
+    Returns:
+        dict: Dictionary of the value of a solution and itself
+    """
+    chance = dict()
+    for chromosome in generation:
+        fitness_ = fitness(chromosome, stuff, available_weight)
+        chance[fitness_] = chromosome
+    return chance
 
 # read and clean information from csv file
 address = 'Myignore/test.csv'
@@ -90,5 +107,4 @@ objects_number = len(objects)
 
 available_weight = float(input('What is knopesack size (Kg): '))
 population = initial_population(100, objects_number)
-for sdf in population:
-    print(fitness(sdf,objects,available_weight))
+all_possibilities(population,objects,available_weight)
