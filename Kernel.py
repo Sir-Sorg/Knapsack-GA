@@ -133,18 +133,40 @@ def roulette_wheel(probability: list):
             return thisTuple[1]
 
 
-def selection(probability:list):
+def selection(probability: list):
     """select the fittest sloution, they are select based on their fitness scores
 
     Args:
         probability (list): list of odds ratio of each element
-    
+
     Returns:
         tuple: selected parrent for goes to crossover
     """
-    parent_1=roulette_wheel(probability)
-    parent_2=roulette_wheel(probability)
-    return parent_1,parent_2
+    parent_1 = roulette_wheel(probability)
+    parent_2 = roulette_wheel(probability)
+    return parent_1, parent_2
+
+
+def single_point_crossover(parent: tuple):
+    """For each pair of parents to be mated, a crossover point is chosen at random from within the genes and bourn new child
+
+    Args:
+        parent (tuple): two parent of child
+
+    Returns:
+        list: new Sloution/Chromosome that bourned
+    """
+    crossoverPoint = random.randint(1, len(parent[0])-1)
+    Offspring = parent[0][:crossoverPoint]+parent[1][crossoverPoint:]
+    return Offspring
+
+
+def crossover(count: int, probability: list):
+    generation = list()
+    for _ in range(count):
+        parent = selection(probability)
+        generation.append(single_point_crossover(parent))
+    return generation
 
 
 # read and clean information from csv file
@@ -164,4 +186,4 @@ available_weight = float(input('What is knopesack size (Kg): '))
 population = initial_population(100, objects_number)
 
 probability = proportion(population, stuff, available_weight)
-selection(probability)
+generation = crossover(100, probability)
