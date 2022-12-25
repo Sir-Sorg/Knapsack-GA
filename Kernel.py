@@ -92,19 +92,62 @@ def all_possibilities(generation: list, stuff: list, available_weight: float):
         chance[fitness_] = chromosome
     return chance
 
+
+def proportion(generation: list, stuff: list, available_weight: float):
+    """Calculating the probability ratio of choosing each sample from 0 to 1
+
+    Args:
+        generation (list):  whole sloution or Chromosomes of this generation
+        stuff (list): list of whole stuff
+        available_weight (float): maximum weight which backpack can carry
+
+    Returns:
+        list: A list of odds ratios for each element
+    """
+    possibilities = all_possibilities(generation, stuff, available_weight)
+    totalPossibilities = sum(possibilities)
+
+    probability = list()
+    possibilitieSoFar = 0
+    for key in possibilities:
+        if not key:  # if key/possibilitie equal to 0 jump!
+            continue
+        proportion = key/totalPossibilities
+        possibilitieSoFar += proportion
+        probability.append((possibilitieSoFar, possibilities[key]))
+    return probability
+
+
+def roulette_wheel(probability: list):
+    """Chose random number between 0,1 and find relative sloution
+
+    Args:
+        probability (list): list of odds ratio of each element
+
+    Returns:
+        list: Chosen Chromosome
+    """
+    randomPoint = random.random()
+    for thisTuple in probability:
+        if randomPoint <= thisTuple[0]:
+            return thisTuple[1]
+
+
 # read and clean information from csv file
 address = 'Myignore/test.csv'
 data = get_input(address)
 data = clean_data(data)
 
 # make a list of objects ; object --> (name - weight - value)
-objects = list()
+stuff = list()
 for index in range(len(data[0])):
     newOne = (data[0][index], data[1][index], data[2][index])
-    objects.append(newOne)
+    stuff.append(newOne)
 
-objects_number = len(objects)
+objects_number = len(stuff)
 
 available_weight = float(input('What is knopesack size (Kg): '))
 population = initial_population(100, objects_number)
-all_possibilities(population,objects,available_weight)
+
+probability = proportion(population, stuff, available_weight)
+selection(probability)
