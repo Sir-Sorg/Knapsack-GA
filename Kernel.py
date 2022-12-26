@@ -180,7 +180,7 @@ def crossover(count: int, probability: list):
     return generation
 
 
-def mutation(genome: list, chance=0.5):
+def mutation(genome: list, chance=0.1):
     """mutaion over single chromosome
 
     Args:
@@ -191,9 +191,25 @@ def mutation(genome: list, chance=0.5):
         list: mutated gene
     """
     for index in range(len(genome)):
-        genome[index] = genome[index] if random(
+        genome[index] = genome[index] if random.random(
         ) > chance else abs(genome[index] - 1)
     return genome
+
+
+def evaluation(generation: list, stuff: list, available_weight: float):
+    """find best sloution of generation
+
+    Args:
+        generation (list): whole sloution or Chromosomes of this generation
+        stuff (list): list of whole stuff
+        available_weight (float): maximum weight which backpack can carry
+
+    Returns:
+        tuple: pair of best fitness and its sloution
+    """
+    possibilities = all_possibilities(generation, stuff, available_weight)
+    maximumFitness = max(possibilities)
+    return possibilities[maximumFitness], maximumFitness
 
 
 # read and clean information from csv file
@@ -214,4 +230,11 @@ population = initial_population(100, objects_number)
 
 probability = proportion(population, stuff, available_weight)
 generation = crossover(100, probability)
-print(generation)
+
+descendant = 10
+while descendant > 0:
+    probability = proportion(generation, stuff, available_weight)
+    generation = crossover(100, probability)
+    descendant -= 1
+
+print(evaluation(generation, stuff, available_weight))
