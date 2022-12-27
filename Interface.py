@@ -677,6 +677,7 @@ class Ui_window(object):
                                     "  border: 1px solid #555;\n"
                                     "  outline: none;\n"
                                     "  font-weight: 800;\n"
+                                    "  font-size: 16px;\n"
                                     "}")
         self.maxValue.setAlignment(QtCore.Qt.AlignCenter)
         self.maxValue.setIndent(0)
@@ -756,6 +757,7 @@ class Ui_window(object):
         result = Kernel.evolution(
             available_weight, descendant, crossoverType, haveElite)
         self.maxValue.setText(f'{result["value"]}')
+        self.progress.append(f'Maximum Value  -> {result["value"]}')
         self.progress.append(f'Best Chromosome -> {result["sloution"]}')
         self.progress.append(f'Items in the Bag -> {result["names"]}')
 
