@@ -210,6 +210,22 @@ def three_point_crossover(parent: tuple):
     return Offspring
 
 
+def uniform_crossover(parent: tuple):
+    """For each pair of parents to be mated, each offspring gene is randomly selected from the parents genes and a new child is born.
+
+    Args:
+        parent (tuple): two parent of child
+
+    Returns:
+        list: new Sloution/Chromosome that borned
+    """
+    Offspring = list()
+    for index in range(len(parent[0])):
+        whichOne = random.choice([0, 1])
+        Offspring.append(parent[whichOne][index])
+    return Offspring
+
+
 def crossover(count: int, probability: list, crossoverType: str):
     """generate new generation with specific count
 
