@@ -228,27 +228,44 @@ def evaluation(generation: list, stuff: list, available_weight: float):
     return possibilities[maximumFitness], maximumFitness
 
 
+def elitism(generation: list, stuff: list, available_weight: float):
+    """find best sloution of generation called elite
+
+    Args:
+        generation (list): whole sloution or Chromosomes of this generation
+        stuff (list): list of whole stuff
+        available_weight (float): maximum weight which backpack can carry
+
+    Returns:
+        list: The best solution that has the most fitness in this generation
+    """
+    possibilities = all_fitness(generation, stuff, available_weight)
+    # find maximum fitness from chance dictionary keys
+    maximumFitness = max(possibilities)
+    return possibilities[maximumFitness]
+
+
 def evolution():
     # read and clean information from csv file
     address = 'Myignore/test.csv'
     data = get_input(address)
     data = clean_data(data)
-    # make a list of objects
+    # make a list of things
     stuff = rebuilde_stuff(data)
 
     available_weight = float(input('What is knopesack size (Kg): '))
-    population = initial_population(100, len(stuff))
+    generation = initial_population(100, len(stuff))
 
-    probability = proportion(population, stuff, available_weight)
-    generation = crossover(100, probability)
-    if 1:
-        elite = elitism(population, stuff, available_weight)
-        generation.append(elite)
-
+    have_elite=False
     descendant = 10
     while descendant > 0:
         probability = proportion(generation, stuff, available_weight)
         generation = crossover(100, probability)
+        
+        if have_elite:
+            elite = elitism(generation, stuff, available_weight)
+            generation.append(elite)
+            
         descendant -= 1
 
     print(evaluation(generation, stuff, available_weight))
