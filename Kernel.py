@@ -1,5 +1,16 @@
 import csv
 import random
+from glob import glob
+
+
+def find_CSV():
+    """Search for all file inside project directory that end with 'csv'
+
+    Returns:
+        str: Name of the CSV file
+    """
+    files = glob('*.csv')
+    return files[-1]
 
 
 def get_input(address: str):
@@ -306,7 +317,7 @@ def elitism(generation: list, stuff: list, available_weight: float):
 def evolution(available_weight, descendant, crossoverType, haveElite=False):
 
     # read and clean information from csv file
-    address = 'test.csv'
+    address = find_CSV()
     data = get_input(address)
     data = clean_data(data)
     # make a list of things
