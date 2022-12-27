@@ -177,6 +177,22 @@ def single_point_crossover(parent: tuple):
     return Offspring
 
 
+def two_point_crossover(parent: tuple):
+    """For each pair of parents to be mated, two crossing points are randomly selected from within the genes and a new offspring is born
+
+    Args:
+        parent (tuple): two parent of child
+
+    Returns:
+        list: new Sloution/Chromosome that borned
+    """
+    crossoverPoint1 = random.randint(1, len(parent[0])-2)
+    crossoverPoint2 = random.randint(crossoverPoint1, len(parent[0]-1))
+    Offspring = parent[0][:crossoverPoint1] + \
+        parent[1][crossoverPoint1:crossoverPoint2]+parent[0][crossoverPoint2:]
+    return Offspring
+
+
 def crossover(count: int, probability: list, crossoverType: str):
     """generate new generation with specific count
 
@@ -194,11 +210,11 @@ def crossover(count: int, probability: list, crossoverType: str):
         if crossoverType == 'single-point-crossover':
             child = single_point_crossover(parent)
         elif crossoverType == '2-point-crossover':
-            pass
+            child = two_point_crossover(parent)
         elif crossoverType == '3-point-crossover':
-            pass
+            child = three_point_crossover(parent)
         elif crossoverType == 'uniform-crossover':
-            pass
+            child = uniform_crossover(parent)
         child = mutation(child)
         generation.append(child)
     return generation
@@ -281,4 +297,4 @@ if __name__ == '__main__':
     available_weight = float(input('What is knopesack size (Kg): '))
     descendant = 10
     crossoverType = 'single-point-crossover'
-    evolution(available_weight, descendant,crossoverType)
+    evolution(available_weight, descendant, crossoverType)
