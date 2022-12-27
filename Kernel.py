@@ -38,6 +38,22 @@ def clean_data(data: list):
     return data
 
 
+def rebuilde_stuff(data: list):
+    """Converting three lines of stuff information into a tuple for each object
+
+    Args:
+        data (list): a list of whole data in three cell
+
+    Returns:
+        list: A list of tuples specifying each object
+    """
+    # creat tuple like this (Pizza , 2kg, 60$)
+    NUMBER_OF_STUFF = len(data[0])  # came from CSV file
+    stuff = [(data[0][index], data[1][index], data[2][index])
+             for index in range(NUMBER_OF_STUFF)]
+    return stuff
+
+
 def initial_population(size: int, objects_number: int):
     """return a Combination of Sloution 
 
@@ -75,7 +91,7 @@ def fitness(chromosome: list, stuff: list, available_weight: float):
     return totalValue if available_weight >= totalWeight else 0
 
 
-def all_possibilities(generation: list, stuff: list, available_weight: float):
+def all_fitness(generation: list, stuff: list, available_weight: float):
     """Collect fitness of all items 
 
     Args:
@@ -94,7 +110,7 @@ def all_possibilities(generation: list, stuff: list, available_weight: float):
 
 
 def proportion(generation: list, stuff: list, available_weight: float):
-    """Calculating the probability ratio of choosing each sample from 0 to 1
+    """Calculation of the probability ratio of choosing each sample, which in total equals 1
 
     Args:
         generation (list):  whole sloution or Chromosomes of this generation
@@ -104,7 +120,7 @@ def proportion(generation: list, stuff: list, available_weight: float):
     Returns:
         list: A list of odds ratios for each element
     """
-    possibilities = all_possibilities(generation, stuff, available_weight)
+    possibilities = all_fitness(generation, stuff, available_weight)
     totalPossibilities = sum(possibilities)
 
     probability = list()
@@ -112,7 +128,7 @@ def proportion(generation: list, stuff: list, available_weight: float):
     for key in possibilities:
         if not key:  # if key/possibilitie equal to 0 jump!
             continue
-        proportion = key/totalPossibilities
+        proportion = key/totalPossibilities  # like 28 / 264 its eqaul to 0.106
         possibilitieSoFar += proportion
         probability.append((possibilitieSoFar, possibilities[key]))
     return probability
@@ -122,7 +138,7 @@ def roulette_wheel(probability: list):
     """Chose random number between 0,1 and find relative sloution
 
     Args:
-        probability (list): list of odds ratio of each element
+        probability (list): list of odds ratio of each element pairs of (chance, sloution)
 
     Returns:
         list: Chosen Chromosome
@@ -137,7 +153,7 @@ def selection(probability: list):
     """select the fittest sloution, they are select based on their fitness scores
 
     Args:
-        probability (list): list of odds ratio of each element
+        probability (list): list of odds ratio of each element pairs of (chance, sloution)
 
     Returns:
         tuple: selected parrent for goes to crossover
@@ -166,7 +182,7 @@ def crossover(count: int, probability: list):
 
     Args:
         count (int): number of member of new generation
-        probability (list): list of odds ratio of each element
+        probability (list): list of odds ratio of each element pairs of (chance, sloution)
 
     Returns:
         list: new generation list
@@ -207,7 +223,7 @@ def evaluation(generation: list, stuff: list, available_weight: float):
     Returns:
         tuple: pair of best fitness and its sloution
     """
-    possibilities = all_possibilities(generation, stuff, available_weight)
+    possibilities = all_fitness(generation, stuff, available_weight)
     maximumFitness = max(possibilities)
     return possibilities[maximumFitness], maximumFitness
 
@@ -217,20 +233,17 @@ def evolution():
     address = 'Myignore/test.csv'
     data = get_input(address)
     data = clean_data(data)
-
-    # make a list of objects ; object --> (name - weight - value)
-    stuff = list()
-    for index in range(len(data[0])):
-        newOne = (data[0][index], data[1][index], data[2][index])
-        stuff.append(newOne)
-
-    objects_number = len(stuff)
+    # make a list of objects
+    stuff = rebuilde_stuff(data)
 
     available_weight = float(input('What is knopesack size (Kg): '))
-    population = initial_population(100, objects_number)
+    population = initial_population(100, len(stuff))
 
     probability = proportion(population, stuff, available_weight)
     generation = crossover(100, probability)
+    if 1:
+        elite = elitism(population, stuff, available_weight)
+        generation.append(elite)
 
     descendant = 10
     while descendant > 0:
