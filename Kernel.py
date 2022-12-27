@@ -177,12 +177,13 @@ def single_point_crossover(parent: tuple):
     return Offspring
 
 
-def crossover(count: int, probability: list):
+def crossover(count: int, probability: list, crossoverType: str):
     """generate new generation with specific count
 
     Args:
-        count (int): number of member of new generation
+        count (int): number of member need in new generation
         probability (list): list of odds ratio of each element pairs of (chance, sloution)
+        crossoverType (str): Crossover type to produce offspring
 
     Returns:
         list: new generation list
@@ -190,7 +191,14 @@ def crossover(count: int, probability: list):
     generation = list()
     for _ in range(count):
         parent = selection(probability)
-        child = single_point_crossover(parent)
+        if crossoverType == 'single-point-crossover':
+            child = single_point_crossover(parent)
+        elif crossoverType == '2-point-crossover':
+            pass
+        elif crossoverType == '3-point-crossover':
+            pass
+        elif crossoverType == 'uniform-crossover':
+            pass
         child = mutation(child)
         generation.append(child)
     return generation
@@ -245,31 +253,32 @@ def elitism(generation: list, stuff: list, available_weight: float):
     return possibilities[maximumFitness]
 
 
-def evolution():
+def evolution(available_weight, descendant, crossoverType, haveElite=False):
+
     # read and clean information from csv file
-    address = 'Myignore/test.csv'
+    address = 'test.csv'
     data = get_input(address)
     data = clean_data(data)
     # make a list of things
     stuff = rebuilde_stuff(data)
 
-    available_weight = float(input('What is knopesack size (Kg): '))
     generation = initial_population(100, len(stuff))
 
-    have_elite=False
-    descendant = 10
     while descendant > 0:
         probability = proportion(generation, stuff, available_weight)
-        generation = crossover(100, probability)
-        
-        if have_elite:
+        generation = crossover(100, probability, crossoverType)
+
+        if haveElite:
             elite = elitism(generation, stuff, available_weight)
             generation.append(elite)
-            
+
         descendant -= 1
 
     print(evaluation(generation, stuff, available_weight))
 
 
 if __name__ == '__main__':
-    evolution()
+    available_weight = float(input('What is knopesack size (Kg): '))
+    descendant = 10
+    crossoverType = 'single-point-crossover'
+    evolution(available_weight, descendant,crossoverType)
