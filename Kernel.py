@@ -187,9 +187,26 @@ def two_point_crossover(parent: tuple):
         list: new Sloution/Chromosome that borned
     """
     crossoverPoint1 = random.randint(1, len(parent[0])-2)
-    crossoverPoint2 = random.randint(crossoverPoint1, len(parent[0]-1))
+    crossoverPoint2 = random.randint(crossoverPoint1, len(parent[0])-1)
     Offspring = parent[0][:crossoverPoint1] + \
         parent[1][crossoverPoint1:crossoverPoint2]+parent[0][crossoverPoint2:]
+    return Offspring
+
+
+def three_point_crossover(parent: tuple):
+    """For each pair of parents to be mated, three crossing points are randomly selected from within the genes and a new offspring is born
+
+    Args:
+        parent (tuple): two parent of child
+
+    Returns:
+        list: new Sloution/Chromosome that borned
+    """
+    crossoverPoint1 = random.randint(1, len(parent[0])-3)
+    crossoverPoint2 = random.randint(crossoverPoint1, len(parent[0])-2)
+    crossoverPoint3 = random.randint(crossoverPoint2, len(parent[0]-1))
+    Offspring = parent[0][:crossoverPoint1] + parent[1][crossoverPoint1:crossoverPoint2] + \
+        parent[0][crossoverPoint2:crossoverPoint3]+parent[1][crossoverPoint3:]
     return Offspring
 
 
