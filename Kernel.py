@@ -204,7 +204,7 @@ def three_point_crossover(parent: tuple):
     """
     crossoverPoint1 = random.randint(1, len(parent[0])-3)
     crossoverPoint2 = random.randint(crossoverPoint1, len(parent[0])-2)
-    crossoverPoint3 = random.randint(crossoverPoint2, len(parent[0]-1))
+    crossoverPoint3 = random.randint(crossoverPoint2, len(parent[0])-1)
     Offspring = parent[0][:crossoverPoint1] + parent[1][crossoverPoint1:crossoverPoint2] + \
         parent[0][crossoverPoint2:crossoverPoint3]+parent[1][crossoverPoint3:]
     return Offspring
@@ -233,6 +233,7 @@ def crossover(count: int, probability: list, crossoverType: str):
         count (int): number of member need in new generation
         probability (list): list of odds ratio of each element pairs of (chance, sloution)
         crossoverType (str): Crossover type to produce offspring
+        its can be: 'single-point-crossover', '2-point-crossover', '3-point-crossover', 'uniform-crossover'
 
     Returns:
         list: new generation list
@@ -329,5 +330,5 @@ def evolution(available_weight, descendant, crossoverType, haveElite=False):
 if __name__ == '__main__':
     available_weight = float(input('What is knopesack size (Kg): '))
     descendant = 10
-    crossoverType = 'single-point-crossover'
+    crossoverType = 'uniform-crossover'
     evolution(available_weight, descendant, crossoverType)
