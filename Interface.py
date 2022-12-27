@@ -706,7 +706,7 @@ class Ui_window(object):
         self.retranslateUi(window)
         QtCore.QMetaObject.connectSlotsByName(window)
 
-        self.Button.clicked.connect(self.evolution)
+        self.Button.clicked.connect(self.runEvolution)
 
     def retranslateUi(self, window):
         _translate = QtCore.QCoreApplication.translate
@@ -735,21 +735,27 @@ class Ui_window(object):
             "window", "--                          Progress will show here                           --"))
         self.maxValue.setText(_translate("window", "Max Value"))
 
-    def evolution(self):
+    def runEvolution(self):
         CROSSOVER_DICT = {0: 'single-point-crossover', 1: '2-point-crossover',
                           2: '3-point-crossover', 3: 'uniform-crossover'}
+        self.progress.clear()
         try:
             available_weight = int(self.weightInput.text())
+            self.progress.append(f'Knapsack Capacity -> {available_weight}')
             descendant = int(self.descendantInput.text())
+            self.progress.append(f'Number of Itration -> {descendant}')
             crossoverType = self.crossoverCombo.currentIndex()
             crossoverType = CROSSOVER_DICT[crossoverType]
+            self.progress.append(f'Crossover Type -> {crossoverType}')
             haveElite = self.checkBox.isChecked()
-            progress = Kernel.evolution(
-                available_weight, descendant, crossoverType, haveElite)
+            self.progress.append(f'Elitism -> {"On" if haveElite else "Off"}')
+            self.progress.append('===================================')
         except:
             progress = 'There was an error in the data entry, please make sure that the entries match and then try again'
+        
+        progress = Kernel.evolution(available_weight, descendant, crossoverType, haveElite)
         self.maxValue.setText(f'{progress[1]}')
-        self.progress.setText(str(progress[0]))
+        self.progress.append(str(progress[0]))
 
 
 if __name__ == "__main__":
