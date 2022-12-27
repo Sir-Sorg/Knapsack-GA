@@ -323,12 +323,12 @@ def evolution(available_weight, descendant, crossoverType, haveElite=False):
             generation.append(elite)
 
         descendant -= 1
-
-    print(evaluation(generation, stuff, available_weight))
+    result = evaluation(generation, stuff, available_weight)
+    return result
 
 
 if __name__ == '__main__':
     available_weight = float(input('What is knopesack size (Kg): '))
     descendant = 10
     crossoverType = 'uniform-crossover'
-    evolution(available_weight, descendant, crossoverType)
+    print(evolution(available_weight, descendant, crossoverType, True))

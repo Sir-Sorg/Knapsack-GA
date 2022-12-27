@@ -676,6 +676,7 @@ class Ui_window(object):
                                     "  margin: 8px 0;\n"
                                     "  border: 1px solid #555;\n"
                                     "  outline: none;\n"
+                                    "  font-weight: 800;\n"
                                     "}")
         self.maxValue.setAlignment(QtCore.Qt.AlignCenter)
         self.maxValue.setIndent(0)
@@ -742,12 +743,13 @@ class Ui_window(object):
             descendant = int(self.descendantInput.text())
             crossoverType = self.crossoverCombo.currentIndex()
             crossoverType = CROSSOVER_DICT[crossoverType]
+            haveElite = self.checkBox.isChecked()
             progress = Kernel.evolution(
-                available_weight, descendant, crossoverType)
+                available_weight, descendant, crossoverType, haveElite)
         except:
             progress = 'There was an error in the data entry, please make sure that the entries match and then try again'
-        finally:
-            pass
+        self.maxValue.setText(f'{progress[1]}')
+        self.progress.setText(str(progress[0]))
 
 
 if __name__ == "__main__":
