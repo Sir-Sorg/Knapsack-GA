@@ -38,7 +38,7 @@ def clean_data(data: list):
     return data
 
 
-def initial_population(count: int, objects_number: int):
+def initial_population(size: int, objects_number: int):
     """return a Combination of Sloution 
 
     Args:
@@ -49,9 +49,9 @@ def initial_population(count: int, objects_number: int):
         list: list of defined number of Choromosome
     """
     population = list()
-    for _ in range(count):
-        # something like 0,1,1,1,0,0,... that show existant of a stuff in backpack
-        newChromosome = [random.choice([0, 1]) for _ in range(objects_number)]
+    for _ in range(size):
+        # something like 0,1,1,1,0,0,... that show existant of a stuff in bagpack
+        newChromosome = random.choices([0, 1], k=objects_number)
         population.append(newChromosome)
     return population
 
@@ -212,29 +212,34 @@ def evaluation(generation: list, stuff: list, available_weight: float):
     return possibilities[maximumFitness], maximumFitness
 
 
-# read and clean information from csv file
-address = 'Myignore/test.csv'
-data = get_input(address)
-data = clean_data(data)
+def evolution():
+    # read and clean information from csv file
+    address = 'Myignore/test.csv'
+    data = get_input(address)
+    data = clean_data(data)
 
-# make a list of objects ; object --> (name - weight - value)
-stuff = list()
-for index in range(len(data[0])):
-    newOne = (data[0][index], data[1][index], data[2][index])
-    stuff.append(newOne)
+    # make a list of objects ; object --> (name - weight - value)
+    stuff = list()
+    for index in range(len(data[0])):
+        newOne = (data[0][index], data[1][index], data[2][index])
+        stuff.append(newOne)
 
-objects_number = len(stuff)
+    objects_number = len(stuff)
 
-available_weight = float(input('What is knopesack size (Kg): '))
-population = initial_population(100, objects_number)
+    available_weight = float(input('What is knopesack size (Kg): '))
+    population = initial_population(100, objects_number)
 
-probability = proportion(population, stuff, available_weight)
-generation = crossover(100, probability)
-
-descendant = 10
-while descendant > 0:
-    probability = proportion(generation, stuff, available_weight)
+    probability = proportion(population, stuff, available_weight)
     generation = crossover(100, probability)
-    descendant -= 1
 
-print(evaluation(generation, stuff, available_weight))
+    descendant = 10
+    while descendant > 0:
+        probability = proportion(generation, stuff, available_weight)
+        generation = crossover(100, probability)
+        descendant -= 1
+
+    print(evaluation(generation, stuff, available_weight))
+
+
+if __name__ == '__main__':
+    evolution()
