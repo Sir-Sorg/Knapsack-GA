@@ -706,7 +706,7 @@ class Ui_window(object):
         self.retranslateUi(window)
         QtCore.QMetaObject.connectSlotsByName(window)
 
-        self.Button.clicked.connect(self.runEvolution)
+        self.Button.clicked.connect(self.run_evolution)
 
     def retranslateUi(self, window):
         _translate = QtCore.QCoreApplication.translate
@@ -735,7 +735,7 @@ class Ui_window(object):
             "window", "--                          Progress will show here                           --"))
         self.maxValue.setText(_translate("window", "Max Value"))
 
-    def runEvolution(self):
+    def run_evolution(self):
         CROSSOVER_DICT = {0: 'single-point-crossover', 1: '2-point-crossover',
                           2: '3-point-crossover', 3: 'uniform-crossover'}
         self.progress.clear()
@@ -751,11 +751,13 @@ class Ui_window(object):
             self.progress.append(f'Elitism -> {"On" if haveElite else "Off"}')
             self.progress.append('===================================')
         except:
-            progress = 'There was an error in the data entry, please make sure that the entries match and then try again'
-        
-        progress = Kernel.evolution(available_weight, descendant, crossoverType, haveElite)
-        self.maxValue.setText(f'{progress[1]}')
-        self.progress.append(str(progress[0]))
+            result = 'There was an error in the data entry, please make sure that the entries match and then try again'
+
+        result = Kernel.evolution(
+            available_weight, descendant, crossoverType, haveElite)
+        self.maxValue.setText(f'{result["value"]}')
+        self.progress.append(f'Best Chromosome -> {result["sloution"]}')
+        self.progress.append(f'Items in the Bag -> {result["names"]}')
 
 
 if __name__ == "__main__":

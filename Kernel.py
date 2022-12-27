@@ -294,7 +294,7 @@ def evaluation(generation: list, stuff: list, available_weight: float):
     """
     possibilities = all_fitness(generation, stuff, available_weight)
     maximumFitness = max(possibilities)
-    return possibilities[maximumFitness], maximumFitness
+    return maximumFitness, possibilities[maximumFitness]
 
 
 def elitism(generation: list, stuff: list, available_weight: float):
@@ -312,6 +312,26 @@ def elitism(generation: list, stuff: list, available_weight: float):
     # find maximum fitness from chance dictionary keys
     maximumFitness = max(possibilities)
     return possibilities[maximumFitness]
+
+
+def beautification_output(bestFitness: float, bestSloution: list, stuff: list):
+    """Display the program solution information in a beautiful style
+
+    Args:
+        bestFitness (float): Maximum fitness that found in generation
+        bestSloution (list): best chromosome with higher fitness
+        stuff (list): list of whole stuff
+
+    Returns:
+        dict: A dictionary of best fitness, sloution, stuff name
+    """
+    output = {'value': bestFitness, 'sloution': bestSloution}
+    names = list()
+    for index in range(len(bestSloution)):
+        if bestSloution[index]:
+            names.append(stuff[index][0])
+    output['names'] = ' - '.join(names)
+    return output
 
 
 def evolution(available_weight, descendant, crossoverType, haveElite=False):
@@ -335,6 +355,7 @@ def evolution(available_weight, descendant, crossoverType, haveElite=False):
 
         descendant -= 1
     result = evaluation(generation, stuff, available_weight)
+    result = beautification_output(result[0], result[1], stuff)
     return result
 
 
