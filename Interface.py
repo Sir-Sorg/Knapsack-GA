@@ -8,12 +8,12 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
-
+import Kernel
 class Ui_window(object):
     def setupUi(self, window):
         window.setObjectName("window")
         window.resize(760, 628)
+        window.setFixedSize(760, 628)
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(41, 40, 38))
         brush.setStyle(QtCore.Qt.SolidPattern)
@@ -155,7 +155,6 @@ class Ui_window(object):
 "  background: #FF4742;\n"
 "  border: 1px solid #FF4742;\n"
 "  border-radius: 6px;\n"
-"  box-shadow: rgba(0, 0, 0, 0.1) 1px 2px 4px;\n"
 "  color: #292826;\n"
 "  font-size: 16px;\n"
 "  font-weight: 800;\n"
@@ -163,7 +162,6 @@ class Ui_window(object):
 "  min-height: 40px;\n"
 "  outline: 0;\n"
 "  text-align: center;\n"
-"  text-rendering: geometricprecision;\n"
 "  vertical-align: middle;\n"
 "}\n"
 "\n"
@@ -178,7 +176,6 @@ class Ui_window(object):
 "  color:#FFFFFF;\n"
 "  padding: 2px 4px;\n"
 "  margin: 8px 0;\n"
-"  box-sizing: border-box;\n"
 "  border: 1px solid #555;\n"
 "  outline: none;\n"
 "}")
@@ -512,7 +509,6 @@ class Ui_window(object):
 "  color:#FFFFFF;\n"
 "  padding: 2px 4px;\n"
 "  margin: 8px 0;\n"
-"  box-sizing: border-box;\n"
 "  border: 1px solid #555;\n"
 "  outline: none;\n"
 "}")
@@ -596,7 +592,6 @@ class Ui_window(object):
 "  color:#FFFFFF;\n"
 "  padding: 2px 4px;\n"
 "  margin: 8px 0;\n"
-"  box-sizing: border-box;\n"
 "  border: 1px solid #555;\n"
 "  outline: none;\n"
 "}")
@@ -608,7 +603,6 @@ class Ui_window(object):
 "  color:green;\n"
 "  padding: 2px 4px;\n"
 "  margin: 8px 0;\n"
-"  box-sizing: border-box;\n"
 "  border: 1px solid #555;\n"
 "  outline: none;\n"
 "}")
@@ -639,6 +633,8 @@ class Ui_window(object):
 
         self.retranslateUi(window)
         QtCore.QMetaObject.connectSlotsByName(window)
+        
+        self.Button.clicked.connect(self.evolution)
 
     def retranslateUi(self, window):
         _translate = QtCore.QCoreApplication.translate
@@ -658,6 +654,8 @@ class Ui_window(object):
         self.progress.setPlaceholderText(_translate("window", "--                          Progress will show here                           --"))
         self.maxValue.setText(_translate("window", "Max Value"))
 
+    def evolution(self):
+        Kernel.evolution(20,10)
 
 if __name__ == "__main__":
     import sys

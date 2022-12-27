@@ -154,6 +154,7 @@ cython_debug/
 
 # My Ignored File
 /Myignore
+test.csv
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
