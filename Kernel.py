@@ -1,3 +1,6 @@
+# A quote from the author in Persian: vase Hagh, vase Khob, vase Bad, vase Zir, vase Bam, vase Khon, vase Tan, nago nagofti ma pirozim ma hanoz namordim.
+# Translated into English: for the Right, for Good, for Bad, for Treble, for Bass, for Blood, for Body, Don't say you didn't say, we won we didn't die yet.
+
 import csv
 import random
 from glob import glob
@@ -364,3 +367,24 @@ if __name__ == '__main__':
     descendant = 10
     crossoverType = 'uniform-crossover'
     print(evolution(available_weight, descendant, crossoverType, True))
+
+    
+# .       .        _+_        .                  .             .
+#                  /|\
+#       .           *     .       .            .                   .
+#.                i/|\i                                   .               .
+#      .    .     // \\*              Happy New Year to everyone
+#                */( )\\      .         Especially programmers        .
+#        .      i/*/ \ \i             *************************
+# .             / /* *\+\              Happy beginning of 2023
+#      .       */// + \*\\*                                              .
+#             i/  /^  ^\  \i    .               ... . ...
+#.        .   / /+/ ()^ *\ \                 ........ .
+#            i//*/_^- -  \*\i              ...  ..  ..               .
+#    .       / // * ^ \ * \ \             ..
+#          i/ /*  ^  * ^ + \ \i          ..     ___            _________
+#          / / // / | \ \  \ *\         >U___^_[[_]|  ______  |_|_|_|_|_|
+#   ____(|)____    |||                  [__________|=|______|=|_|_|_|_|_|=
+#  |_____|_____|   |||                   oo OOOO oo   oo  oo   o-o   o-o
+# -|     |     |-.-|||.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
+#  |_____|_____|
