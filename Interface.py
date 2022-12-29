@@ -10,12 +10,12 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import Kernel
 
-
 class Ui_window(object):
     def setupUi(self, window):
         window.setObjectName("window")
         window.resize(1232, 654)
         window.setFixedSize(1232, 654)
+        window.setMaximumSize(QtCore.QSize(1232, 654))
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(41, 40, 38))
         brush.setStyle(QtCore.Qt.SolidPattern)
@@ -157,6 +157,7 @@ class Ui_window(object):
 "  background: #FF4742;\n"
 "  border: 1px solid #FF4742;\n"
 "  border-radius: 6px;\n"
+"  box-shadow: rgba(0, 0, 0, 0.1) 1px 2px 4px;\n"
 "  color: #292826;\n"
 "  font-size: 16px;\n"
 "  font-weight: 800;\n"
@@ -164,6 +165,7 @@ class Ui_window(object):
 "  min-height: 40px;\n"
 "  outline: 0;\n"
 "  text-align: center;\n"
+"  text-rendering: geometricprecision;\n"
 "  vertical-align: middle;\n"
 "}\n"
 "\n"
@@ -178,6 +180,7 @@ class Ui_window(object):
 "  color:#FFFFFF;\n"
 "  padding: 2px 4px;\n"
 "  margin: 8px 0;\n"
+"  box-sizing: border-box;\n"
 "  border: 1px solid #555;\n"
 "  outline: none;\n"
 "}")
@@ -511,6 +514,7 @@ class Ui_window(object):
 "  color:#FFFFFF;\n"
 "  padding: 2px 4px;\n"
 "  margin: 8px 0;\n"
+"  box-sizing: border-box;\n"
 "  border: 1px solid #555;\n"
 "  outline: none;\n"
 "}")
@@ -599,6 +603,7 @@ class Ui_window(object):
 "  color:green;\n"
 "  padding: 2px 4px;\n"
 "  margin: 8px 0;\n"
+"  box-sizing: border-box;\n"
 "  border: 1px solid #555;\n"
 "  outline: none;\n"
 "}")
@@ -977,12 +982,14 @@ class Ui_window(object):
         self.selection.addItem("")
         self.selection.addItem("")
         self.selection.addItem("")
+        self.selection.addItem("")
         self.populationSize = QtWidgets.QLineEdit(self.centralwidget)
         self.populationSize.setGeometry(QtCore.QRect(900, 112, 271, 51))
         self.populationSize.setStyleSheet("*{\n"
 "  color:#FFFFFF;\n"
 "  padding: 2px 4px;\n"
 "  margin: 8px 0;\n"
+"  box-sizing: border-box;\n"
 "  border: 1px solid #555;\n"
 "  outline: none;\n"
 "}")
@@ -1001,6 +1008,7 @@ class Ui_window(object):
 "  color:#FFFFFF;\n"
 "  padding: 2px 4px;\n"
 "  margin: 8px 0;\n"
+"  box-sizing: border-box;\n"
 "  border: 1px solid #555;\n"
 "  outline: none;\n"
 "}")
@@ -1047,7 +1055,6 @@ class Ui_window(object):
 
         self.retranslateUi(window)
         QtCore.QMetaObject.connectSlotsByName(window)
-        
         self.Button.clicked.connect(self.run_evolution)
 
     def retranslateUi(self, window):
@@ -1071,28 +1078,36 @@ class Ui_window(object):
         self.label_9.setText(_translate("window", "Selection Type"))
         self.selection.setItemText(0, _translate("window", "Roulette Wheel"))
         self.selection.setItemText(1, _translate("window", "Stochastic Universal Sampling (SUS)"))
-        self.selection.setItemText(2, _translate("window", "Tournament"))
+        self.selection.setItemText(2, _translate("window", "Ranking"))
+        self.selection.setItemText(3, _translate("window", "Tournament"))
         self.populationSize.setPlaceholderText(_translate("window", "100 or more..."))
         self.progressBar.setPlaceholderText(_translate("window", "--                               Progress will show here                                --"))
+    
+    def read_user_input(self):
+        CROSSOVER_DICT = {0: 'single-point-crossover', 1: '2-point-crossover',
+                          2: '3-point-crossover', 3: 'uniform-crossover'}  
+        SELECTION_DICT={0:'',1:'',2:''}  
+        try:
+            available_weight = int(self.weight.text())            
+            descendant = int(self.descendant.text())
+            crossoverType = self.crossover.currentIndex()
+            crossoverType = CROSSOVER_DICT[crossoverType]            
+            haveElite = self.elitism.isChecked()
+            
 
+        except:
+            result = 'There was an error in the data entry, please make sure that the entries match and then try again'
+        
+    
     def run_evolution(self):
         CROSSOVER_DICT = {0: 'single-point-crossover', 1: '2-point-crossover',
                           2: '3-point-crossover', 3: 'uniform-crossover'}
         self.progressBar.clear()
-        try:
-            available_weight = int(self.weight.text())
-            self.progressBar.append(f'Knapsack Capacity -> {available_weight}')
-            descendant = int(self.descendant.text())
-            self.progressBar.append(f'Number of Itration -> {descendant}')
-            crossoverType = self.crossover.currentIndex()
-            crossoverType = CROSSOVER_DICT[crossoverType]
-            self.progressBar.append(f'Crossover Type -> {crossoverType}')
-            haveElite = self.elitism.isChecked()
-            self.progressBar.append(f'Elitism -> {"On" if haveElite else "Off"}')
-            self.progressBar.append('===================================')
-        except:
-            result = 'There was an error in the data entry, please make sure that the entries match and then try again'
-
+        self.progressBar.append(f'Knapsack Capacity -> {available_weight}')
+        self.progressBar.append(f'Number of Itration -> {descendant}')
+        self.progressBar.append(f'Crossover Type -> {crossoverType}')
+        self.progressBar.append(f'Elitism -> {"On" if haveElite else "Off"}')
+        self.progressBar.append('===================================')
         result = Kernel.evolution(
             available_weight, descendant, crossoverType, haveElite)
         self.maxValue.setText(f'{result["value"]}')
