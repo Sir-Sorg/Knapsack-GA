@@ -230,14 +230,37 @@ def tournament_selection(probabilities: list, tournamentSize=2):
     return bestChromosome
 
 
+def stochastic_universal_sampling_selection(probabilities: list):
+    """Chose random number between 0,1 and find two sloution facing each other
+
+    Args:
+        probability (list): A list of the probability of choosing each sample
+
+    Returns:
+        list: Two Chosen Chromosome
+    """
+    cumulativeProbability = calculate_cumulative_probability(probabilities)
+    randomPoint_1 = random.random()
+    randomPoint_2 = (randomPoint_1+0.5) % 1
+    parents = list()
+    for key, value in cumulativeProbability.items():
+        if randomPoint_1 <= key:
+            parents.append(value)
+            randomPoint_1 = 1.1
+        if randomPoint_2 <= key:
+            parents.append(value)
+            randomPoint_2 = 1.1
+    return tuple(parents)
+
+
 def selection(probabilities: list, selectionType: str):
 
     if selectionType == 'roulette-wheel-selection':
         parent_1 = roulette_wheel_selection(probabilities)
         parent_2 = roulette_wheel_selection(probabilities)
-    # elif selectionType == 'stochastic-universal-sampling-selection':
-    #     parent_1 = roulette_wheel_selection(probabilities)
-    #     parent_2 = roulette_wheel_selection(probabilities)
+    elif selectionType == 'stochastic-universal-sampling-selection':
+        parent_1, parent_2 = stochastic_universal_sampling_selection(
+            probabilities)
     elif selectionType == 'ranking-selection':
         parent_1 = ranking_selection(probabilities)
         parent_2 = ranking_selection(probabilities)
@@ -441,7 +464,7 @@ if __name__ == '__main__':
     descendant = 10
     populationSize = 100
     crossoverType = 'uniform-crossover'
-    print(evolution(populationSize, 0.1, 'tournament-selection', availableWeight,
+    print(evolution(populationSize, 0.1, 'stochastic-universal-sampling-selection', availableWeight,
           descendant, crossoverType, True))
 
 
