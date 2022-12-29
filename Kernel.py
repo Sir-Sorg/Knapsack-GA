@@ -28,8 +28,7 @@ def get_input(address: str):
     data = list()
     with open(address) as csvFile:
         csvReader = csv.reader(csvFile)
-        for row in csvReader:
-            data.append(row)
+        data = [row for row in csvReader]
     return data
 
 
@@ -42,13 +41,9 @@ def clean_data(data: list):
     Returns:
         list: organized data with recognizable objects in a sequense
     """
-    name = data[0]
-    weight = data[1]
-    value = data[2]
-    name = list(map(lambda arg: arg.capitalize(), name))
-    weight = list(map(float, weight))
-    value = list(map(float, value))
-    data = name, weight, value
+    data[0] = list(map(lambda arg: arg.capitalize(), data[0]))
+    data[1] = list(map(float, data[1]))
+    data[2] = list(map(float, data[2]))
     return data
 
 
@@ -68,12 +63,12 @@ def rebuilde_stuff(data: list):
     return stuff
 
 
-def initial_population(size: int, objects_number: int):
+def initial_population(size: int, objects_count: int):
     """return a Combination of Sloution 
 
     Args:
-        count (int): count of needed Chromosome
-        objects_number (int): count of total stuff
+        size (int): count of needed Chromosome
+        objects_count (int): count of total stuff
 
     Returns:
         list: list of defined number of Choromosome
@@ -81,7 +76,7 @@ def initial_population(size: int, objects_number: int):
     population = list()
     for _ in range(size):
         # something like 0,1,1,1,0,0,... that show existant of a stuff in bagpack
-        newChromosome = random.choices([0, 1], k=objects_number)
+        newChromosome = random.choices([0, 1], k=objects_count)
         population.append(newChromosome)
     return population
 
@@ -263,25 +258,26 @@ def crossover(count: int, probability: list, crossoverType: str):
             child = three_point_crossover(parent)
         elif crossoverType == 'uniform-crossover':
             child = uniform_crossover(parent)
-        child = mutation(child)
         generation.append(child)
     return generation
 
 
-def mutation(genome: list, chance=0.1):
+def mutation(chromosomes: list, chance=0.1):
     """mutaion over single chromosome
 
     Args:
-        sloution (list): a certain chromosome
-        chance (float, optional): limitation of mutaion chance. Defaults to 0.5.
+        chromosomes (list): a list of chromosome
+        chance (float, optional): limitation of mutaion chance. Defaults to 0.1.
 
     Returns:
-        list: mutated gene
+        list: whole mutated chromosomes
     """
-    for index in range(len(genome)):
-        genome[index] = genome[index] if random.random(
-        ) > chance else abs(genome[index] - 1)
-    return genome
+    mutant = list()
+    for chromosome in chromosomes:
+        gnome = list(map(lambda gen: gen if random.random()
+                     > chance else abs(gen - 1), chromosome))
+        mutant.append(gnome)
+    return mutant
 
 
 def evaluation(generation: list, stuff: list, available_weight: float):
@@ -337,27 +333,28 @@ def beautification_output(bestFitness: float, bestSloution: list, stuff: list):
     return output
 
 
-def evolution(available_weight, descendant, crossoverType, haveElite=False):
+def evolution(populationSize: int, mutationRate: float, availableWeight: float, descendant: int, crossoverType: str, haveElite: bool):
 
     # read and clean information from csv file
     address = find_CSV()
     data = get_input(address)
     data = clean_data(data)
+
     # make a list of things
     stuff = rebuilde_stuff(data)
-
-    generation = initial_population(100, len(stuff))
+    generation = initial_population(populationSize, len(stuff))
 
     while descendant > 0:
-        probability = proportion(generation, stuff, available_weight)
-        generation = crossover(100, probability, crossoverType)
+        probability = proportion(generation, stuff, availableWeight)
+        generation = crossover(populationSize, probability, crossoverType)
+        generation = mutation(generation, mutationRate)
 
         if haveElite:
-            elite = elitism(generation, stuff, available_weight)
+            elite = elitism(generation, stuff, availableWeight)
             generation.append(elite)
 
         descendant -= 1
-    result = evaluation(generation, stuff, available_weight)
+    result = evaluation(generation, stuff, availableWeight)
     result = beautification_output(result[0], result[1], stuff)
     return result
 
@@ -365,21 +362,23 @@ def evolution(available_weight, descendant, crossoverType, haveElite=False):
 if __name__ == '__main__':
     available_weight = float(input('What is knopesack size (Kg): '))
     descendant = 10
+    populationSize = 100
     crossoverType = 'uniform-crossover'
-    print(evolution(available_weight, descendant, crossoverType, True))
+    print(evolution(populationSize,0.1, available_weight,
+          descendant, crossoverType, True))
 
-    
+
 # .       .        _+_        .                  .             .
 #                  /|\
 #       .           *     .       .            .                   .
-#.                i/|\i                                   .               .
+# .                i/|\i                                   .               .
 #      .    .     // \\*              Happy New Year to everyone
 #                */( )\\      .         Especially programmers        .
 #        .      i/*/ \ \i             *************************
 # .             / /* *\+\              Happy beginning of 2023
 #      .       */// + \*\\*                                              .
 #             i/  /^  ^\  \i    .               ... . ...
-#.        .   / /+/ ()^ *\ \                 ........ .
+# .        .   / /+/ ()^ *\ \                 ........ .
 #            i//*/_^- -  \*\i              ...  ..  ..               .
 #    .       / // * ^ \ * \ \             ..
 #          i/ /*  ^  * ^ + \ \i          ..     ___            _________
