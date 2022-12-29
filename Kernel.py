@@ -131,63 +131,98 @@ def calculate_probabilities(generation: list, stuff: list, available_weight: flo
     """
     allFitness = all_fitness(generation, stuff, available_weight)
     totalFitness = sum(allFitness)
-    Possibilities = dict()
+    probability = dict()
     for key, value in allFitness.items():
         # like 28 / 264 its eqaul --> 0.10 : [1,0,0,1,1,0,...]
-        Possibilities[key/totalFitness] = value
-    return Possibilities
+        probability[key/totalFitness] = value
+    return probability
 
 
-def calculate_cumulative_probability (generation: list, stuff: list, available_weight: float):
+def calculate_cumulative_probability(probabilities: dict):
     """Calculation of the cumulative probability ratio of choosing each sample, which in total equals 1
 
     Args:
-        generation (list):  whole sloution or Chromosomes of this generation
-        stuff (list): list of whole stuff
-        available_weight (float): maximum weight which backpack can carry
+        probability (dict):  dictionary of the probability of choosing each sample
 
     Returns:
         dict: A dict of cumulative probability consis of each element
     """
     cumulative = dict()
-    possibilities = calculate_probabilities(
-        generation, stuff, available_weight)
-    possibilitieSoFar = 0
-    for key, value in possibilities.items():
+    probabilitiesSoFar = 0
+    for key, value in probabilities.items():
         if not key:  # if possibilitie=fitness equal to 0 jump!
             continue
-        possibilitieSoFar += key
+        probabilitiesSoFar += key
         # pair of chance and chromosome like [0.78] : [1,0,0,1,0,1,...]
-        cumulative[possibilitieSoFar] = value
+        cumulative[probabilitiesSoFar] = value
     return cumulative
 
 
-def roulette_wheel(probability: list):
+def roulette_wheel_selection(probability: dict):
     """Chose random number between 0,1 and find relative sloution
 
     Args:
-        probability (list): list of odds ratio of each element pairs of (chance, sloution)
+        probability (dict): A dictionary of the probability of choosing each sample
 
     Returns:
         list: Chosen Chromosome
     """
+    cumulativeProbability = calculate_cumulative_probability(probability)
     randomPoint = random.random()
-    for thisTuple in probability:
-        if randomPoint <= thisTuple[0]:
-            return thisTuple[1]
+    for key, value in cumulativeProbability.items():
+        if randomPoint <= key:
+            return value
 
 
-def selection(probability: list):
-    """select the fittest sloution, they are select based on their fitness scores
+def calculate_rank(probabilities: dict):
+    """Calculating the rank of chromosomes from the probability dictionary
 
     Args:
-        probability (list): list of odds ratio of each element pairs of (chance, sloution)
+        probabilities (dict): A dictionary of the probability of choosing each sample
 
     Returns:
-        tuple: selected parrent for goes to crossover
+        dict: The dictionary includes the rank of each chromosome and itself
     """
-    parent_1 = roulette_wheel(probability)
-    parent_2 = roulette_wheel(probability)
+    sortedProbability = sorted(probabilities.items())
+    # sum of all ranke is --> n*n+1 / 2
+    sumOfRank = (len(sortedProbability)*(len(sortedProbability)+1))//2
+    rank = dict()
+    probabilitiesSoFar = 0
+    for count, value in enumerate(sortedProbability, start=1):
+        probabilitiesSoFar += count/sumOfRank  # have kind of cumulative inside
+        rank[probabilitiesSoFar] = value[1]
+    return rank
+
+
+def ranking_selection(probabilities: dict):
+    """Finding parent chromosome using ranking method
+
+    Args:
+        probabilities (dict): A dictionary of the probability of choosing each sample
+
+    Returns:
+        list: hosen Chromosome
+    """
+    rank = calculate_rank(probabilities)
+    randomPoint = random.random()
+    for key, value in rank.items():
+        if randomPoint <= key:
+            return value
+
+
+def selection(probabilities: dict, selectionType: str):
+    if selectionType == 'roulette-wheel-selection':
+        parent_1 = roulette_wheel_selection(probabilities)
+        parent_2 = roulette_wheel_selection(probabilities)
+    elif selectionType == 'stochastic-universal-sampling-selection':
+        parent_1 = roulette_wheel_selection(probabilities)
+        parent_2 = roulette_wheel_selection(probabilities)
+    elif selectionType == 'ranking-selection':
+        parent_1 = ranking_selection(probabilities)
+        parent_2 = ranking_selection(probabilities)
+    elif selectionType == 'tournament-selection':
+        parent_1 = roulette_wheel_selection(probabilities)
+        parent_2 = roulette_wheel_selection(probabilities)
     return parent_1, parent_2
 
 
@@ -254,12 +289,12 @@ def uniform_crossover(parent: tuple):
     return Offspring
 
 
-def crossover(count: int, probability: list, crossoverType: str):
+def crossover(count: int, parents: tuple, crossoverType: str):
     """generate new generation with specific count
 
     Args:
         count (int): number of member need in new generation
-        probability (list): list of odds ratio of each element pairs of (chance, sloution)
+        parents (tuple): A tuple containing two list of parents
         crossoverType (str): Crossover type to produce offspring
         its can be: 'single-point-crossover', '2-point-crossover', '3-point-crossover', 'uniform-crossover'
 
@@ -268,15 +303,14 @@ def crossover(count: int, probability: list, crossoverType: str):
     """
     generation = list()
     for _ in range(count):
-        parent = selection(probability)
         if crossoverType == 'single-point-crossover':
-            child = single_point_crossover(parent)
+            child = single_point_crossover(parents)
         elif crossoverType == '2-point-crossover':
-            child = two_point_crossover(parent)
+            child = two_point_crossover(parents)
         elif crossoverType == '3-point-crossover':
-            child = three_point_crossover(parent)
+            child = three_point_crossover(parents)
         elif crossoverType == 'uniform-crossover':
-            child = uniform_crossover(parent)
+            child = uniform_crossover(parents)
         generation.append(child)
     return generation
 
@@ -352,7 +386,7 @@ def beautification_output(bestFitness: float, bestSloution: list, stuff: list):
     return output
 
 
-def evolution(populationSize: int, mutationRate: float, availableWeight: float, descendant: int, crossoverType: str, haveElite: bool):
+def evolution(populationSize: int, mutationRate: float, selectionType: str, availableWeight: float, descendant: int, crossoverType: str, haveElite: bool):
 
     # read and clean information from csv file
     address = find_CSV()
@@ -364,8 +398,10 @@ def evolution(populationSize: int, mutationRate: float, availableWeight: float, 
     generation = initial_population(populationSize, len(stuff))
 
     while descendant > 0:
-        probability = calculate_cumulative_probability (generation, stuff, availableWeight)
-        generation = crossover(populationSize, probability, crossoverType)
+        probabilities = calculate_probabilities(
+            generation, stuff, available_weight)
+        parents = selection(probabilities, selectionType)
+        generation = crossover(populationSize, parents, crossoverType)
         generation = mutation(generation, mutationRate)
 
         if haveElite:
@@ -383,7 +419,7 @@ if __name__ == '__main__':
     descendant = 10
     populationSize = 100
     crossoverType = 'uniform-crossover'
-    print(evolution(populationSize, 0.1, available_weight,
+    print(evolution(populationSize, 0.1, 'ranking-selection', available_weight,
           descendant, crossoverType, True))
 
 
