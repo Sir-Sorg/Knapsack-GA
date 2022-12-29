@@ -118,8 +118,28 @@ def all_fitness(generation: list, stuff: list, available_weight: float):
     return chance
 
 
-def proportion(generation: list, stuff: list, available_weight: float):
-    """Calculation of the probability ratio of choosing each sample, which in total equals 1
+def calculate_probabilities(generation: list, stuff: list, available_weight: float):
+    """Calculate the probability of selecting each chromosome
+
+    Args:
+        generation (list): whole sloution or Chromosomes of this generation
+        stuff (list): list of whole stuff
+        available_weight (float): maximum weight which backpack can carry
+
+    Returns:
+        dict: A dictionary of the probability of choosing each sample
+    """
+    allFitness = all_fitness(generation, stuff, available_weight)
+    totalFitness = sum(allFitness)
+    Possibilities = dict()
+    for key, value in allFitness.items():
+        # like 28 / 264 its eqaul --> 0.10 : [1,0,0,1,1,0,...]
+        Possibilities[key/totalFitness] = value
+    return Possibilities
+
+
+def calculate_cumulative_probability (generation: list, stuff: list, available_weight: float):
+    """Calculation of the cumulative probability ratio of choosing each sample, which in total equals 1
 
     Args:
         generation (list):  whole sloution or Chromosomes of this generation
@@ -127,20 +147,19 @@ def proportion(generation: list, stuff: list, available_weight: float):
         available_weight (float): maximum weight which backpack can carry
 
     Returns:
-        list: A list of odds ratios for each element
+        dict: A dict of cumulative probability consis of each element
     """
-    possibilities = all_fitness(generation, stuff, available_weight)
-    totalPossibilities = sum(possibilities)
-
-    probability = list()
+    cumulative = dict()
+    possibilities = calculate_probabilities(
+        generation, stuff, available_weight)
     possibilitieSoFar = 0
-    for key in possibilities:
-        if not key:  # if key/possibilitie equal to 0 jump!
+    for key, value in possibilities.items():
+        if not key:  # if possibilitie=fitness equal to 0 jump!
             continue
-        proportion = key/totalPossibilities  # like 28 / 264 its eqaul to 0.106
-        possibilitieSoFar += proportion
-        probability.append((possibilitieSoFar, possibilities[key]))
-    return probability
+        possibilitieSoFar += key
+        # pair of chance and chromosome like [0.78] : [1,0,0,1,0,1,...]
+        cumulative[possibilitieSoFar] = value
+    return cumulative
 
 
 def roulette_wheel(probability: list):
@@ -345,7 +364,7 @@ def evolution(populationSize: int, mutationRate: float, availableWeight: float, 
     generation = initial_population(populationSize, len(stuff))
 
     while descendant > 0:
-        probability = proportion(generation, stuff, availableWeight)
+        probability = calculate_cumulative_probability (generation, stuff, availableWeight)
         generation = crossover(populationSize, probability, crossoverType)
         generation = mutation(generation, mutationRate)
 
@@ -364,7 +383,7 @@ if __name__ == '__main__':
     descendant = 10
     populationSize = 100
     crossoverType = 'uniform-crossover'
-    print(evolution(populationSize,0.1, available_weight,
+    print(evolution(populationSize, 0.1, available_weight,
           descendant, crossoverType, True))
 
 
