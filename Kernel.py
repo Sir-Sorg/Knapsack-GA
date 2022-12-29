@@ -132,7 +132,7 @@ def calculate_probabilities(generation: list, stuff: list, available_weight: flo
     allFitness = all_fitness(generation, stuff, available_weight)
     totalFitness = sum(f for f, c in allFitness)
 
-    # like 28 / 264 its eqaul --> 0.10 , [1,0,0,1,1,0,...]
+    # like 28 / 264 its eqaul --> (0.10 , [1,0,0,1,1,0,...])
     probabilities = [(fitness/totalFitness, chromosome)
                      for fitness, chromosome in allFitness]
     return probabilities
@@ -211,7 +211,27 @@ def ranking_selection(probabilities: list):
             return value
 
 
+def tournament_selection(probabilities: list, tournamentSize=2):
+    """Selecting members randomly and finding the strongest example among them
+
+    Args:
+        probabilities (list): A list of the probability of choosing each sample
+        tournamentSize (int, optional): The number of members to participate in the tournament.
+        Defaults to 10%  of population if 10%  is less then 2 is minimum equal to 2.
+
+    Returns:
+        list: The best chromosome among the members
+    """
+    if tournamentSize == 2 and len(probabilities) > 20:
+        tournamentSize = len(probabilities)//10
+    members = random.choices(probabilities, k=tournamentSize)
+    members.sort(reverse=True)
+    bestChromosome = members[0][1]
+    return bestChromosome
+
+
 def selection(probabilities: list, selectionType: str):
+
     if selectionType == 'roulette-wheel-selection':
         parent_1 = roulette_wheel_selection(probabilities)
         parent_2 = roulette_wheel_selection(probabilities)
@@ -221,9 +241,9 @@ def selection(probabilities: list, selectionType: str):
     elif selectionType == 'ranking-selection':
         parent_1 = ranking_selection(probabilities)
         parent_2 = ranking_selection(probabilities)
-    # elif selectionType == 'tournament-selection':
-    #     parent_1 = roulette_wheel_selection(probabilities)
-    #     parent_2 = roulette_wheel_selection(probabilities)
+    elif selectionType == 'tournament-selection':
+        parent_1 = tournament_selection(probabilities)
+        parent_2 = tournament_selection(probabilities)
     return parent_1, parent_2
 
 
@@ -410,7 +430,7 @@ def evolution(populationSize: int, mutationRate: float, selectionType: str, avai
             elite = elitism(generation, stuff, availableWeight)
             generation.append(elite)
         descendant -= 1
-        
+
     result = evaluation(generation, stuff, availableWeight)
     result = beautification_output(result[0], result[1], stuff)
     return result
@@ -421,7 +441,7 @@ if __name__ == '__main__':
     descendant = 10
     populationSize = 100
     crossoverType = 'uniform-crossover'
-    print(evolution(populationSize, 0.1, 'roulette-wheel-selection', availableWeight,
+    print(evolution(populationSize, 0.1, 'tournament-selection', availableWeight,
           descendant, crossoverType, True))
 
 
