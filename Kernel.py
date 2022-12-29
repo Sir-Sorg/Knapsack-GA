@@ -254,7 +254,16 @@ def stochastic_universal_sampling_selection(probabilities: list):
 
 
 def selection(probabilities: list, selectionType: str):
+    """Selection of parents according to the type determined
 
+    Args:
+        probabilities (list): A list of the probability of choosing each sample
+        selectionType (str): A certain type of selection
+        its can be: 'roulette-wheel-selection', 'stochastic-universal-sampling-selection', 'ranking-selection', 'tournament-selection'
+
+    Returns:
+        tuple: Two parents selected in the shape of an tuple to produce a offspring
+    """
     if selectionType == 'roulette-wheel-selection':
         parent_1 = roulette_wheel_selection(probabilities)
         parent_2 = roulette_wheel_selection(probabilities)
