@@ -1217,7 +1217,7 @@ class Ui_window(object):
                           2: 'ranking-selection', 3: 'tournament-selection'}
         userInput = dict()
         try:
-            userInput['available_weight'] = int(self.weight.text())
+            userInput['availableWeight'] = int(self.weight.text())
             userInput['descendant'] = int(self.descendant.text())
             userInput['crossoverType'] = self.crossover.currentIndex()
             userInput['crossoverType'] = CROSSOVER_DICT[userInput['crossoverType']]
@@ -1228,26 +1228,43 @@ class Ui_window(object):
             userInput['selectionType'] = SELECTION_DICT[userInput['selectionType']]
 
         except:
+            context = 'There is a problem with the input data. Please make sure the information is in correct format and try again.'
             msg = QMessageBox()
             msg.setWindowTitle('Input Error')
-            msg.setText(
-                'There was an error in the data entry, please make sure that the entries match and then try again')
+            msg.setText(context)
+            msg.setIcon(QMessageBox.Question)
             msg.exec_()
+
         finally:
             return userInput
+
+    def write_user_information(self, information: dict):
+        self.progressBar.clear()
+        self.progressBar.append(
+            f'Knapsack Capacity -> {information["availableWeight"]}')
+        self.progressBar.append(
+            f'Number of Itration -> {information["descendant"]}')
+        self.progressBar.append(
+            f'Crossover Type -> {information["crossoverType"]}')
+        self.progressBar.append(
+            f'Population Size -> {information["populationSize"]}')
+        self.progressBar.append(
+            f'Mutation Chance -> {information["mutationRate"]}')
+        self.progressBar.append(
+            f'Selection Type -> {information["selectionType"]}')
+        self.progressBar.append(
+            f'Elitism -> {"On" if information["haveElite"] else "Off"}')
+        self.progressBar.append('===================================')
 
     def run_evolution(self):
         userInput = self.read_user_input()
         if len(userInput) == 0:
             return
-        self.progressBar.clear()
-        self.progressBar.append(f'Knapsack Capacity -> {available_weight}')
-        self.progressBar.append(f'Number of Itration -> {descendant}')
-        self.progressBar.append(f'Crossover Type -> {crossoverType}')
-        self.progressBar.append(f'Elitism -> {"On" if haveElite else "Off"}')
-        self.progressBar.append('===================================')
-        result = Kernel.evolution(
-            available_weight, descendant, crossoverType, haveElite)
+
+        self.write_user_information(userInput)
+        result = Kernel.evolution(userInput['populationSize'], userInput['mutationRate'], userInput['selectionType'],
+                                  userInput['availableWeight'], userInput['descendant'], userInput['crossoverType'], userInput['haveElite'])
+        
         self.maxValue.setText(f'{result["value"]}')
         self.progressBar.append(f'Maximum Value  -> {result["value"]}')
         self.progressBar.append(f'Best Chromosome -> {result["sloution"]}')
