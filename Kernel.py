@@ -109,12 +109,12 @@ def all_fitness(generation: list, stuff: list, available_weight: float):
         available_weight (float): maximum weight which backpack can carry
 
     Returns:
-        dict: Dictionary of the value of a solution and itself
+        list: A list of tuple the value of a solution and itself
     """
-    chance = dict()
+    chance = list()
     for chromosome in generation:
         fitness_ = fitness(chromosome, stuff, available_weight)
-        chance[fitness_] = chromosome
+        chance.append((fitness_, chromosome))
     return chance
 
 
@@ -127,63 +127,64 @@ def calculate_probabilities(generation: list, stuff: list, available_weight: flo
         available_weight (float): maximum weight which backpack can carry
 
     Returns:
-        dict: A dictionary of the probability of choosing each sample
+        list: A list of the probability of choosing each sample and itsown
     """
     allFitness = all_fitness(generation, stuff, available_weight)
-    totalFitness = sum(allFitness)
-    probability = dict()
-    for key, value in allFitness.items():
-        # like 28 / 264 its eqaul --> 0.10 : [1,0,0,1,1,0,...]
-        probability[key/totalFitness] = value
-    return probability
+    totalFitness = sum(f for f, c in allFitness)
+
+    # like 28 / 264 its eqaul --> 0.10 , [1,0,0,1,1,0,...]
+    probabilities = [(fitness/totalFitness, chromosome)
+                     for fitness, chromosome in allFitness]
+    return probabilities
 
 
-def calculate_cumulative_probability(probabilities: dict):
+def calculate_cumulative_probability(probabilities: list):
     """Calculation of the cumulative probability ratio of choosing each sample, which in total equals 1
 
     Args:
-        probability (dict):  dictionary of the probability of choosing each sample
+        probability (list):  A list of the probability of choosing each sample
 
     Returns:
         dict: A dict of cumulative probability consis of each element
     """
     cumulative = dict()
     probabilitiesSoFar = 0
-    for key, value in probabilities.items():
-        if not key:  # if possibilitie=fitness equal to 0 jump!
+    for probability, chromosome in probabilities:
+        # if possibilitie (fitness/total Fitness) equal to 0 jump!
+        if not probability:
             continue
-        probabilitiesSoFar += key
+        probabilitiesSoFar += probability
         # pair of chance and chromosome like [0.78] : [1,0,0,1,0,1,...]
-        cumulative[probabilitiesSoFar] = value
+        cumulative[probabilitiesSoFar] = chromosome
     return cumulative
 
 
-def roulette_wheel_selection(probability: dict):
+def roulette_wheel_selection(probabilities: list):
     """Chose random number between 0,1 and find relative sloution
 
     Args:
-        probability (dict): A dictionary of the probability of choosing each sample
+        probability (list): A list of the probability of choosing each sample
 
     Returns:
         list: Chosen Chromosome
     """
-    cumulativeProbability = calculate_cumulative_probability(probability)
+    cumulativeProbability = calculate_cumulative_probability(probabilities)
     randomPoint = random.random()
     for key, value in cumulativeProbability.items():
         if randomPoint <= key:
             return value
 
 
-def calculate_rank(probabilities: dict):
+def calculate_rank(probabilities: list):
     """Calculating the rank of chromosomes from the probability dictionary
 
     Args:
-        probabilities (dict): A dictionary of the probability of choosing each sample
+        probabilities (list): A dictionary of the probability of choosing each sample
 
     Returns:
         dict: The dictionary includes the rank of each chromosome and itself
     """
-    sortedProbability = sorted(probabilities.items())
+    sortedProbability = sorted(probabilities)
     # sum of all ranke is --> n*n+1 / 2
     sumOfRank = (len(sortedProbability)*(len(sortedProbability)+1))//2
     rank = dict()
@@ -194,11 +195,11 @@ def calculate_rank(probabilities: dict):
     return rank
 
 
-def ranking_selection(probabilities: dict):
+def ranking_selection(probabilities: list):
     """Finding parent chromosome using ranking method
 
     Args:
-        probabilities (dict): A dictionary of the probability of choosing each sample
+        probabilities (list): A list of the probability of choosing each sample
 
     Returns:
         list: hosen Chromosome
@@ -210,19 +211,19 @@ def ranking_selection(probabilities: dict):
             return value
 
 
-def selection(probabilities: dict, selectionType: str):
+def selection(probabilities: list, selectionType: str):
     if selectionType == 'roulette-wheel-selection':
         parent_1 = roulette_wheel_selection(probabilities)
         parent_2 = roulette_wheel_selection(probabilities)
-    elif selectionType == 'stochastic-universal-sampling-selection':
-        parent_1 = roulette_wheel_selection(probabilities)
-        parent_2 = roulette_wheel_selection(probabilities)
+    # elif selectionType == 'stochastic-universal-sampling-selection':
+    #     parent_1 = roulette_wheel_selection(probabilities)
+    #     parent_2 = roulette_wheel_selection(probabilities)
     elif selectionType == 'ranking-selection':
         parent_1 = ranking_selection(probabilities)
         parent_2 = ranking_selection(probabilities)
-    elif selectionType == 'tournament-selection':
-        parent_1 = roulette_wheel_selection(probabilities)
-        parent_2 = roulette_wheel_selection(probabilities)
+    # elif selectionType == 'tournament-selection':
+    #     parent_1 = roulette_wheel_selection(probabilities)
+    #     parent_2 = roulette_wheel_selection(probabilities)
     return parent_1, parent_2
 
 
@@ -334,7 +335,7 @@ def mutation(chromosomes: list, chance=0.1):
 
 
 def evaluation(generation: list, stuff: list, available_weight: float):
-    """find best sloution of generation
+    """find best fitness and sloution of generation
 
     Args:
         generation (list): whole sloution or Chromosomes of this generation
@@ -344,9 +345,13 @@ def evaluation(generation: list, stuff: list, available_weight: float):
     Returns:
         tuple: pair of best fitness and its sloution
     """
-    possibilities = all_fitness(generation, stuff, available_weight)
-    maximumFitness = max(possibilities)
-    return maximumFitness, possibilities[maximumFitness]
+    probabilities = all_fitness(generation, stuff, available_weight)
+    maxFitness = maxChromosome = 0
+    for fitness, chromosome in probabilities:
+        if fitness > maxFitness:
+            maxFitness = fitness
+            maxChromosome = chromosome
+    return maxFitness, maxChromosome
 
 
 def elitism(generation: list, stuff: list, available_weight: float):
@@ -360,10 +365,8 @@ def elitism(generation: list, stuff: list, available_weight: float):
     Returns:
         list: The best solution that has the most fitness in this generation
     """
-    possibilities = all_fitness(generation, stuff, available_weight)
-    # find maximum fitness from chance dictionary keys
-    maximumFitness = max(possibilities)
-    return possibilities[maximumFitness]
+    elite = evaluation(generation, stuff, available_weight)[1]
+    return elite
 
 
 def beautification_output(bestFitness: float, bestSloution: list, stuff: list):
@@ -399,27 +402,26 @@ def evolution(populationSize: int, mutationRate: float, selectionType: str, avai
 
     while descendant > 0:
         probabilities = calculate_probabilities(
-            generation, stuff, available_weight)
+            generation, stuff, availableWeight)
         parents = selection(probabilities, selectionType)
         generation = crossover(populationSize, parents, crossoverType)
         generation = mutation(generation, mutationRate)
-
         if haveElite:
             elite = elitism(generation, stuff, availableWeight)
             generation.append(elite)
-
         descendant -= 1
+        
     result = evaluation(generation, stuff, availableWeight)
     result = beautification_output(result[0], result[1], stuff)
     return result
 
 
 if __name__ == '__main__':
-    available_weight = float(input('What is knopesack size (Kg): '))
+    availableWeight = float(input('What is knopesack size (Kg): '))
     descendant = 10
     populationSize = 100
     crossoverType = 'uniform-crossover'
-    print(evolution(populationSize, 0.1, 'ranking-selection', available_weight,
+    print(evolution(populationSize, 0.1, 'roulette-wheel-selection', availableWeight,
           descendant, crossoverType, True))
 
 
