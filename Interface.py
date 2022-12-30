@@ -1170,12 +1170,21 @@ class Ui_window(object):
         self.statusbar = QtWidgets.QStatusBar(window)
         self.statusbar.setObjectName("statusbar")
         window.setStatusBar(self.statusbar)
+
+        # plot structer
         self.figure = plt.figure()
+        self.figure.set_facecolor('#292826')
+        plt.rc('axes', edgecolor='#292826')
+        plt.rcParams['axes.labelcolor'] = '#FFFFFF'
+        plt.rcParams['xtick.color'] = '#FFFFFF'
+        plt.rcParams['ytick.color'] = '#FFFFFF'
         self.canvas = FigureCanvas(self.figure)
         layout = QtWidgets.QVBoxLayout(self.plot_frame)
         layout.addWidget(self.canvas)
+
         self.retranslateUi(window)
         QtCore.QMetaObject.connectSlotsByName(window)
+
         self.Button.clicked.connect(self.run_evolution)
 
     def retranslateUi(self, window):
@@ -1294,9 +1303,11 @@ class Ui_window(object):
         plter.plot(x_smooth, y2_smooth, color='#88c999')
         # plter.xlabel('Number of Generations')
         # plter.ylabel('fitness of Generation')
-        plter.set(xlabel='Number of Generations', ylabel ='fitness of Generation' )
+        plter.set(xlabel='Number of Generations',
+                  ylabel='fitness of Generation')
         plter.grid(linestyle='--', linewidth=0.5)
-        plter.legend(['Avrage', 'Sloution'])
+        plter.legend(['Avrage', 'Sloution'], loc="lower left")
+        plter.set_facecolor('#292826')
         self.canvas.draw()
 
 
