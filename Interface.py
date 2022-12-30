@@ -10,6 +10,9 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 import Kernel
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+import matplotlib.pyplot as plt
+from scipy.interpolate import make_interp_spline
 
 
 class Ui_window(object):
@@ -1129,16 +1132,16 @@ class Ui_window(object):
                                        "}")
         self.progressBar.setReadOnly(True)
         self.progressBar.setObjectName("progressBar")
-        self.plot = QtWidgets.QWidget(self.centralwidget)
-        self.plot.setGeometry(QtCore.QRect(60, 382, 421, 240))
-        self.plot.setStyleSheet("*{\n"
-                                "  color:#FFFFFF;\n"
-                                "  padding: 2px 4px;\n"
-                                "  margin: 8px 0;\n"
-                                "  border: 1px solid #555;\n"
-                                "  outline: none;\n"
-                                "}")
-        self.plot.setObjectName("plot")
+        self.plot_frame = QtWidgets.QFrame(self.centralwidget)
+        self.plot_frame.setGeometry(QtCore.QRect(60, 382, 421, 240))
+        self.plot_frame.setStyleSheet("*{\n"
+                                      "  color:#FFFFFF;\n"
+                                      "  padding: 2px 4px;\n"
+                                      "  margin: 8px 0;\n"
+                                      "  border: 1px solid #555;\n"
+                                      "  outline: none;\n"
+                                      "}")
+        self.plot_frame.setObjectName("plot_frame")
         self.label_5.raise_()
         self.label_4.raise_()
         self.label_1.raise_()
@@ -1158,7 +1161,7 @@ class Ui_window(object):
         self.populationSize.raise_()
         self.mutaion.raise_()
         self.progressBar.raise_()
-        self.plot.raise_()
+        self.plot_frame.raise_()
         window.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(window)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1232, 22))
@@ -1167,7 +1170,10 @@ class Ui_window(object):
         self.statusbar = QtWidgets.QStatusBar(window)
         self.statusbar.setObjectName("statusbar")
         window.setStatusBar(self.statusbar)
-
+        self.figure = plt.figure()
+        self.canvas = FigureCanvas(self.figure)
+        layout = QtWidgets.QVBoxLayout(self.plot_frame)
+        layout.addWidget(self.canvas)
         self.retranslateUi(window)
         QtCore.QMetaObject.connectSlotsByName(window)
         self.Button.clicked.connect(self.run_evolution)
@@ -1247,14 +1253,14 @@ class Ui_window(object):
         self.progressBar.append(
             f'Crossover Type -> {information["crossoverType"]}')
         self.progressBar.append(
-            f'Population Size -> {information["populationSize"]}')
+            f'Number of Chromosome -> {information["populationSize"]}')
         self.progressBar.append(
             f'Mutation Chance -> {information["mutationRate"]}')
         self.progressBar.append(
             f'Selection Type -> {information["selectionType"]}')
         self.progressBar.append(
             f'Elitism -> {"On" if information["haveElite"] else "Off"}')
-        self.progressBar.append('===================================')
+        self.progressBar.append('===========================================')
 
     def run_evolution(self):
         userInput = self.read_user_input()
@@ -1264,11 +1270,34 @@ class Ui_window(object):
         self.write_user_information(userInput)
         result = Kernel.evolution(userInput['populationSize'], userInput['mutationRate'], userInput['selectionType'],
                                   userInput['availableWeight'], userInput['descendant'], userInput['crossoverType'], userInput['haveElite'])
-        
+
         self.maxValue.setText(f'{result["value"]}')
         self.progressBar.append(f'Maximum Value  -> {result["value"]}')
         self.progressBar.append(f'Best Chromosome -> {result["sloution"]}')
         self.progressBar.append(f'Items in the Bag -> {result["names"]}')
+        X = list(range(userInput['descendant']+1))
+        Y_1 = result["Y1"]
+        Y_2 = result["Y2"]
+        self.plot_canvas(X, Y_1, Y_2)
+
+    def plot_canvas(self, x_axis, y1_axis, y2_axis):
+
+        x_smooth = Kernel.linspace(0, max(x_axis), 100)
+        spl1 = make_interp_spline(x_axis, y1_axis)
+        spl2 = make_interp_spline(x_axis, y2_axis)
+        y1_smooth = spl1(x_smooth)
+        y2_smooth = spl2(x_smooth)
+
+        self.figure.clear()
+        plter = self.figure.add_subplot(111)
+        plter.plot(x_smooth, y1_smooth, color='hotpink')
+        plter.plot(x_smooth, y2_smooth, color='#88c999')
+        # plter.xlabel('Number of Generations')
+        # plter.ylabel('fitness of Generation')
+        plter.set(xlabel='Number of Generations', ylabel ='fitness of Generation' )
+        plter.grid(linestyle='--', linewidth=0.5)
+        plter.legend(['Avrage', 'Sloution'])
+        self.canvas.draw()
 
 
 if __name__ == "__main__":
