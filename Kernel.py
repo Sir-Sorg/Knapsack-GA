@@ -425,18 +425,21 @@ def elitism(generation: list, stuff: list, available_weight: float):
     return elite
 
 
-def beautification_output(bestFitness: float, bestSloution: list, stuff: list):
+def decorate(bestFitness: float, bestSloution: list, stuff: list, Y1: list, Y2: list):
     """Display the program solution information in a beautiful style
 
     Args:
         bestFitness (float): Maximum fitness that found in generation
         bestSloution (list): best chromosome with higher fitness
         stuff (list): list of whole stuff
+        Y1 (list): list of y-axis of each generation fitness average
+        Y2 (list): list of y-axis of each generation best sloution
 
     Returns:
-        dict: A dictionary of best fitness, sloution, stuff name
+        dict: A dictionary of best fitness, sloution, stuff name, y-axis of averages, y-axis of sloutions
     """
-    output = {'value': bestFitness, 'sloution': bestSloution}
+    output = {'value': bestFitness,
+              'sloution': bestSloution, 'Y1': Y1, 'Y2': Y2}
     names = [stuff[i][0] for i in range(
         len(bestSloution)) if bestSloution[i]]  # if this gen not zero
     output['names'] = ' - '.join(names)
@@ -509,7 +512,6 @@ def evolution(populationSize: int, mutationRate: float, selectionType: str, avai
     Y_1 = [fitness_average(generation, stuff, availableWeight)]
     # best sloution fitness in this generation
     Y_2 = [evaluation(generation, stuff, availableWeight)[0]]
-    X = list(range(descendant+1))
 
     while descendant > 0:
         probabilities = calculate_probabilities(
@@ -528,9 +530,7 @@ def evolution(populationSize: int, mutationRate: float, selectionType: str, avai
         descendant -= 1
 
     result = evaluation(generation, stuff, availableWeight)
-    result = beautification_output(result[0], result[1], stuff)
-
-    draw_plot(X, Y_1, Y_2)
+    result = decorate(result[0], result[1], stuff, Y_1, Y_2)
 
     return result
 
@@ -541,8 +541,11 @@ if __name__ == '__main__':
     descendant = 10
     populationSize = 100
     crossoverType = 'uniform-crossover'
-    print(evolution(populationSize, 0.1, 'stochastic-universal-sampling-selection', availableWeight,
-          descendant, crossoverType, True))
+    answer = evolution(populationSize, 0.1, 'stochastic-universal-sampling-selection', availableWeight,
+                       descendant, crossoverType, True)
+    print(answer)
+    X = list(range(descendant+1))
+    draw_plot(X, answer['Y1'], answer['Y2'])
 
 
 # .       .        _+_        .                  .             .
