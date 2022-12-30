@@ -1255,6 +1255,7 @@ class Ui_window(object):
 
     def write_user_information(self, information: dict):
         self.progressBar.clear()
+        self.progressBar.append(' '*49+'INPUT')
         self.progressBar.append(
             f'Knapsack Capacity -> {information["availableWeight"]}')
         self.progressBar.append(
@@ -1269,7 +1270,7 @@ class Ui_window(object):
             f'Selection Type -> {information["selectionType"]}')
         self.progressBar.append(
             f'Elitism -> {"On" if information["haveElite"] else "Off"}')
-        self.progressBar.append('===========================================')
+        self.progressBar.append('=============================================')
 
     def run_evolution(self):
         userInput = self.read_user_input()
@@ -1281,6 +1282,7 @@ class Ui_window(object):
                                   userInput['availableWeight'], userInput['descendant'], userInput['crossoverType'], userInput['haveElite'])
 
         self.maxValue.setText(f'{result["value"]}')
+        self.progressBar.append(' '*48+'ANSWER')
         self.progressBar.append(f'Maximum Value  -> {result["value"]}')
         self.progressBar.append(f'Best Chromosome -> {result["sloution"]}')
         self.progressBar.append(f'Items in the Bag -> {result["names"]}')
