@@ -4,7 +4,10 @@
 import csv
 import random
 from glob import glob
+
+# only for drawing plot
 import matplotlib.pyplot as plt
+from scipy.interpolate import make_interp_spline
 
 
 def find_CSV():
@@ -434,10 +437,8 @@ def beautification_output(bestFitness: float, bestSloution: list, stuff: list):
         dict: A dictionary of best fitness, sloution, stuff name
     """
     output = {'value': bestFitness, 'sloution': bestSloution}
-    names = list()
-    for index in range(len(bestSloution)):
-        if bestSloution[index]:
-            names.append(stuff[index][0])
+    names = [stuff[i][0] for i in range(
+        len(bestSloution)) if bestSloution[i]]  # if this gen not zero
     output['names'] = ' - '.join(names)
     return output
 
@@ -459,6 +460,41 @@ def fitness_average(generation: list, stuff: list, available_weight: float):
     return mean
 
 
+def linspace(start: int, end: int, dimensions=100):
+    """Convert a list of regular numbers to a list of more numbers in the same range
+
+    Args:
+        start (int): The lowest number
+        end (int): The highest number
+        dimensions (int, optional): Interval length. Defaults to 100.
+
+    Returns:
+        list: A list in the same range with more numbers
+    """
+
+    if dimensions == 1:
+        return [end]
+    step = (end - start)/(dimensions - 1)
+    return [start + step * i for i in range(dimensions)]
+
+
+def draw_plot(x_axis, y1_axis, y2_axis):
+    x_smooth = linspace(0, max(x_axis), 100)
+    spl1 = make_interp_spline(x_axis, y1_axis)
+    spl2 = make_interp_spline(x_axis, y2_axis)
+    y1_smooth = spl1(x_smooth)
+    y2_smooth = spl2(x_smooth)
+
+    plt.plot(x_smooth, y1_smooth, color='hotpink')
+    plt.plot(x_smooth, y2_smooth, color='#88c999')
+    plt.xlabel('Number of Generations')
+    plt.ylabel('fitness of Generation')
+    plt.grid(linestyle='--', linewidth=0.5)
+    plt.legend(['Avrage', 'Sloution'])
+
+    plt.show()
+
+
 def evolution(populationSize: int, mutationRate: float, selectionType: str, availableWeight: float, descendant: int, crossoverType: str, haveElite: bool):
 
     # read and clean information from csv file
@@ -470,10 +506,11 @@ def evolution(populationSize: int, mutationRate: float, selectionType: str, avai
     stuff = rebuilde_stuff(data)
     generation = initial_population(populationSize, len(stuff))
 
-    # plot Y-axis points
-    averagePoints = [fitness_average(generation, stuff, availableWeight)]
-    bestPoints=[evaluation(generation, stuff, availableWeight)[0]]
-    XPoints = range(1, descendant+2)
+    Y_1 = [fitness_average(generation, stuff, availableWeight)]
+    # best sloution fitness in this generation
+    Y_2 = [evaluation(generation, stuff, availableWeight)[0]]
+    X = list(range(descendant+1))
+
     while descendant > 0:
         probabilities = calculate_probabilities(
             generation, stuff, availableWeight)
@@ -483,17 +520,18 @@ def evolution(populationSize: int, mutationRate: float, selectionType: str, avai
         if haveElite:
             elite = elitism(generation, stuff, availableWeight)
             generation.append(elite)
-        Y = fitness_average(generation, stuff, availableWeight)
-        averagePoints.append(Y)
-        bestPoints.append(evaluation(generation, stuff, availableWeight)[0])
+
+        # plot axis
+        Y_1.append(fitness_average(generation, stuff, availableWeight))
+        Y_2.append(evaluation(generation, stuff, availableWeight)[0])
+
         descendant -= 1
 
     result = evaluation(generation, stuff, availableWeight)
     result = beautification_output(result[0], result[1], stuff)
-    print(averagePoints)
-    plt.plot(XPoints, averagePoints, 'o-k')
-    plt.plot(XPoints,bestPoints,'o-b')
-    plt.show()
+
+    draw_plot(X, Y_1, Y_2)
+
     return result
 
 
