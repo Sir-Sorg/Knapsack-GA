@@ -1303,8 +1303,6 @@ class Ui_window(object):
         plter = self.figure.add_subplot(111)
         plter.plot(x_smooth, y1_smooth, color='hotpink')
         plter.plot(x_smooth, y2_smooth, color='#88c999')
-        # plter.xlabel('Number of Generations')
-        # plter.ylabel('fitness of Generation')
         plter.set(xlabel='Number of Generations',
                   ylabel='fitness of Generation')
         plter.grid(linestyle='--', linewidth=0.5)

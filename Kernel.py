@@ -481,7 +481,14 @@ def linspace(start: int, end: int, dimensions=100):
     return [start + step * i for i in range(dimensions)]
 
 
-def draw_plot(x_axis, y1_axis, y2_axis):
+def draw_plot(x_axis: list, y1_axis: list, y2_axis: list):
+    """Plotting average and best fitness curves
+
+    Args:
+        x_axis (list): The coordinates of the x points on the axis
+        y1_axis (list): Coordinates of the average points on the axis
+        y2_axis (list): Coordinates of the points of the best solution on the axis
+    """
     x_smooth = linspace(0, max(x_axis), 100)
     spl1 = make_interp_spline(x_axis, y1_axis)
     spl2 = make_interp_spline(x_axis, y2_axis)
@@ -499,6 +506,20 @@ def draw_plot(x_axis, y1_axis, y2_axis):
 
 
 def evolution(populationSize: int, mutationRate: float, selectionType: str, availableWeight: float, descendant: int, crossoverType: str, haveElite: bool):
+    """The main body of the genetic algorithm implementation and the caller of all functions
+
+    Args:
+        populationSize (int): The population size of generations is equal to the number of chromosomes
+        mutationRate (float): The chance rate for a genetic mutation in a gene of a chromosome
+        selectionType (str): The type of parent selection method for the crossover stage
+        availableWeight (float): Maximum weight which backpack can carry
+        descendant (int): The total number of generations or in other words the number of generation repetitions
+        crossoverType (str): A type of crossover method to produce a new offspring or chromosome
+        haveElite (bool): The presence or absence of elite on its direct transmission
+
+    Returns:
+        dict: Dictionary containing problem answer information
+    """
 
     # read and clean information from csv file
     address = find_CSV()
@@ -546,6 +567,7 @@ if __name__ == '__main__':
     print(answer)
     X = list(range(descendant+1))
     draw_plot(X, answer['Y1'], answer['Y2'])
+    
 
 
 # .       .        _+_        .                  .             .
