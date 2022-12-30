@@ -4,6 +4,7 @@
 import csv
 import random
 from glob import glob
+import matplotlib.pyplot as plt
 
 
 def find_CSV():
@@ -441,6 +442,23 @@ def beautification_output(bestFitness: float, bestSloution: list, stuff: list):
     return output
 
 
+def fitness_average(generation: list, stuff: list, available_weight: float):
+    """Finding the average fitness of the current generation
+
+    Args:
+        generation (list): whole sloution or Chromosomes of this generation
+        stuff (list): list of whole stuff
+        available_weight (float): maximum weight which backpack can carry
+
+    Returns:
+        float: Decimal number indicating the average fitness
+    """
+    allFitness = all_fitness(generation, stuff, available_weight)
+    totalFitness = sum(f for f, c in allFitness)
+    mean = totalFitness/len(allFitness)
+    return mean
+
+
 def evolution(populationSize: int, mutationRate: float, selectionType: str, availableWeight: float, descendant: int, crossoverType: str, haveElite: bool):
 
     # read and clean information from csv file
@@ -452,6 +470,10 @@ def evolution(populationSize: int, mutationRate: float, selectionType: str, avai
     stuff = rebuilde_stuff(data)
     generation = initial_population(populationSize, len(stuff))
 
+    # plot Y-axis points
+    averagePoints = [fitness_average(generation, stuff, availableWeight)]
+    bestPoints=[evaluation(generation, stuff, availableWeight)[0]]
+    XPoints = range(1, descendant+2)
     while descendant > 0:
         probabilities = calculate_probabilities(
             generation, stuff, availableWeight)
@@ -461,13 +483,21 @@ def evolution(populationSize: int, mutationRate: float, selectionType: str, avai
         if haveElite:
             elite = elitism(generation, stuff, availableWeight)
             generation.append(elite)
+        Y = fitness_average(generation, stuff, availableWeight)
+        averagePoints.append(Y)
+        bestPoints.append(evaluation(generation, stuff, availableWeight)[0])
         descendant -= 1
 
     result = evaluation(generation, stuff, availableWeight)
     result = beautification_output(result[0], result[1], stuff)
+    print(averagePoints)
+    plt.plot(XPoints, averagePoints, 'o-k')
+    plt.plot(XPoints,bestPoints,'o-b')
+    plt.show()
     return result
 
 
+# for my test ->
 if __name__ == '__main__':
     availableWeight = float(input('What is knopesack size (Kg): '))
     descendant = 10
