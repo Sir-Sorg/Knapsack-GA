@@ -544,7 +544,7 @@ def evolution(populationSize: int, mutationRate: float, selectionType: str, avai
             generation, stuff, availableWeight)
         if not probabilities:
             return {'value': 0,
-                    'sloution': 'No solution found', 'Y1': [0 for i in range(descendant+1)], 'Y2': [0 for i in range(descendant+1)], 'names': 'Nothing'}
+                    'sloution': 'No solution found', 'maxValue': 0, 'maxSloution': 'No solution found', 'Y1': [0 for i in range(descendant+1)], 'Y2': [0 for i in range(descendant+1)], 'names': 'Nothing'}
 
         parents = selection(probabilities, selectionType)
         generation = crossover(populationSize, parents, crossoverType)
