@@ -427,12 +427,14 @@ def elitism(generation: list, stuff: list, available_weight: float):
     return elite
 
 
-def decorate_answer(bestFitness: float, bestSloution: list, stuff: list, Y1: list, Y2: list):
+def decorate_answer(lastFitness: float, lastSloution: list, bestFitness: float, bestSloution: list, stuff: list, Y1: list, Y2: list):
     """Display the program solution information in a beautiful style
 
     Args:
-        bestFitness (float): Maximum fitness that found in generation
-        bestSloution (list): best chromosome with higher fitness
+        lastFitness (float): best fitness that found in conclusion generation
+        lastSloution (list): best chromosome with higher fitness in conclusion generation
+        bestFitness (float): Maximum fitness that found throughout generation
+        bestSloution (list): Maximum chromosome with higher fitness throughout generation
         stuff (list): list of whole stuff
         Y1 (list): list of y-axis of each generation fitness average
         Y2 (list): list of y-axis of each generation best sloution
@@ -440,8 +442,8 @@ def decorate_answer(bestFitness: float, bestSloution: list, stuff: list, Y1: lis
     Returns:
         dict: A dictionary of best fitness, sloution, stuff name, y-axis of averages, y-axis of sloutions
     """
-    output = {'value': bestFitness,
-              'sloution': bestSloution, 'Y1': Y1, 'Y2': Y2}
+    output = {'value': lastFitness, 'sloution': lastSloution,
+              'maxValue': bestFitness, 'maxSloution': bestSloution, 'Y1': Y1, 'Y2': Y2}
     names = [stuff[i][0] for i in range(
         len(bestSloution)) if bestSloution[i]]  # if this gen not zero
     output['names'] = ' - '.join(names)
@@ -531,6 +533,7 @@ def evolution(populationSize: int, mutationRate: float, selectionType: str, avai
     # make a list of things
     stuff = rebuilde_stuff(data)
     generation = initial_population(populationSize, len(stuff))
+    maxSloution = [0, []]
 
     Y_1 = [fitness_average(generation, stuff, availableWeight)]
     # best sloution fitness in this generation
@@ -550,14 +553,17 @@ def evolution(populationSize: int, mutationRate: float, selectionType: str, avai
             elite = elitism(generation, stuff, availableWeight)
             generation.append(elite)
 
+        result = evaluation(generation, stuff, availableWeight)
+        if result[0] > maxSloution[0]:
+            maxSloution = result
+
         # plot axis
         Y_1.append(fitness_average(generation, stuff, availableWeight))
-        Y_2.append(evaluation(generation, stuff, availableWeight)[0])
+        Y_2.append(result[0])
 
         descendant -= 1
-
-    result = evaluation(generation, stuff, availableWeight)
-    result = decorate_answer(result[0], result[1], stuff, Y_1, Y_2)
+    result = decorate_answer(
+        result[0], result[1], maxSloution[0], maxSloution[1], stuff, Y_1, Y_2)
 
     return result
 

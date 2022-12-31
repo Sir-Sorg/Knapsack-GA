@@ -661,23 +661,23 @@ class Ui_window(object):
         self.label_6.setFont(font)
         self.label_6.setStyleSheet("color: rgb(255, 255, 255);")
         self.label_6.setObjectName("label_6")
-        self.maxValue = QtWidgets.QLabel(self.centralwidget)
-        self.maxValue.setGeometry(QtCore.QRect(525, 572, 160, 51))
+        self.value = QtWidgets.QLabel(self.centralwidget)
+        self.value.setGeometry(QtCore.QRect(525, 572, 160, 51))
         font = QtGui.QFont()
         font.setPointSize(12)
         font.setBold(True)
         font.setWeight(75)
-        self.maxValue.setFont(font)
-        self.maxValue.setStyleSheet("*{\n"
+        self.value.setFont(font)
+        self.value.setStyleSheet("*{\n"
                                     "  color:green;\n"
                                     "  padding: 2px 4px;\n"
                                     "  margin: 8px 0;\n"
                                     "  border: 1px solid #555;\n"
                                     "  outline: none;\n"
                                     "}")
-        self.maxValue.setAlignment(QtCore.Qt.AlignCenter)
-        self.maxValue.setIndent(0)
-        self.maxValue.setObjectName("maxValue")
+        self.value.setAlignment(QtCore.Qt.AlignCenter)
+        self.value.setIndent(0)
+        self.value.setObjectName("maxValue")
         self.label_7 = QtWidgets.QLabel(self.centralwidget)
         self.label_7.setGeometry(QtCore.QRect(640, 200, 105, 19))
         palette = QtGui.QPalette()
@@ -1153,7 +1153,7 @@ class Ui_window(object):
         self.label_3.raise_()
         self.weight.raise_()
         self.label_6.raise_()
-        self.maxValue.raise_()
+        self.value.raise_()
         self.label_7.raise_()
         self.label_8.raise_()
         self.label_9.raise_()
@@ -1210,7 +1210,7 @@ class Ui_window(object):
             "window", "20 Kg or different amount..."))
         self.label_6.setText(_translate(
             "window", "Carrying weight of the backpack"))
-        self.maxValue.setText(_translate("window", "Max Value"))
+        self.value.setText(_translate("window", "Max Value"))
         self.label_7.setText(_translate("window", "Mutation Rate"))
         self.label_8.setText(_translate(
             "window", "Generation Population Size"))
@@ -1282,10 +1282,12 @@ class Ui_window(object):
         result = Kernel.evolution(userInput['populationSize'], userInput['mutationRate'], userInput['selectionType'],
                                   userInput['availableWeight'], userInput['descendant'], userInput['crossoverType'], userInput['haveElite'])
 
-        self.maxValue.setText(f'{result["value"]}')
+        self.value.setText(f'{result["value"]}')
         self.progressBar.append(' '*48+'ANSWER')
-        self.progressBar.append(f'Maximum Value  -> {result["value"]}')
-        self.progressBar.append(f'Best Chromosome -> {result["sloution"]}')
+        self.progressBar.append(f'Conclusion Value -> {result["value"]}')
+        self.progressBar.append(f'Conclusion Chromosome -> {result["sloution"]}')
+        self.progressBar.append(f'Maximum Value  -> {result["maxValue"]}')
+        self.progressBar.append(f'Maximum Chromosome  -> {result["maxSloution"]}')
         self.progressBar.append(f'Items in the Bag -> {result["names"]}')
         Y_1 = result["Y1"]
         Y_2 = result["Y2"]
