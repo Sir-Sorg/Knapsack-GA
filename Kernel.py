@@ -135,9 +135,9 @@ def calculate_probabilities(generation: list, stuff: list, available_weight: flo
     """
     allFitness = all_fitness(generation, stuff, available_weight)
     totalFitness = sum(f for f, c in allFitness)
-    if totalFitness == 0: # when we didt have any correct sloution
+    if totalFitness == 0:  # when we didt have any correct sloution
         return []
-    
+
     # like 28 / 264 its eqaul --> (0.10 , [1,0,0,1,1,0,...])
     probabilities = [(fitness/totalFitness, chromosome)
                      for fitness, chromosome in allFitness]
@@ -483,15 +483,15 @@ def linspace(start: int, end: int, dimensions=100):
     return [start + step * i for i in range(dimensions)]
 
 
-def draw_plot(x_axis: list, y1_axis: list, y2_axis: list):
+def draw_plot(y1_axis: list, y2_axis: list):
     """Plotting average and best fitness curves
 
     Args:
-        x_axis (list): The coordinates of the x points on the axis
         y1_axis (list): Coordinates of the average points on the axis
         y2_axis (list): Coordinates of the points of the best solution on the axis
     """
-    x_smooth = linspace(0, max(x_axis), 100)
+    x_axis = list(range(len(y1_axis)))
+    x_smooth = linspace(0, x_axis[-1], 100)
     spl1 = make_interp_spline(x_axis, y1_axis)
     spl2 = make_interp_spline(x_axis, y2_axis)
     y1_smooth = spl1(x_smooth)
@@ -541,8 +541,8 @@ def evolution(populationSize: int, mutationRate: float, selectionType: str, avai
             generation, stuff, availableWeight)
         if not probabilities:
             return {'value': 0,
-              'sloution': 'No solution found', 'Y1': [0 for i in range(descendant+1)], 'Y2': [0 for i in range(descendant+1)],'names':'Nothing'}
-            
+                    'sloution': 'No solution found', 'Y1': [0 for i in range(descendant+1)], 'Y2': [0 for i in range(descendant+1)], 'names': 'Nothing'}
+
         parents = selection(probabilities, selectionType)
         generation = crossover(populationSize, parents, crossoverType)
         generation = mutation(generation, mutationRate)
@@ -564,15 +564,15 @@ def evolution(populationSize: int, mutationRate: float, selectionType: str, avai
 
 # for my test ->
 if __name__ == '__main__':
-    availableWeight = float(input('What is knopesack size (Kg): '))
-    descendant = 10
-    populationSize = 100
-    crossoverType = 'uniform-crossover'
+    #availableWeight = float(input('What is knopesack size (Kg): '))
+    availableWeight = 750
+    descendant = 100
+    populationSize = 10
+    crossoverType = 'single-point-crossover'
     answer = evolution(populationSize, 0.1, 'roulette-wheel-selection', availableWeight,
-                       descendant, crossoverType, True)
+                       descendant, crossoverType, False)
     print(answer)
-    X = list(range(descendant+1))
-    draw_plot(X, answer['Y1'], answer['Y2'])
+    draw_plot(answer['Y1'], answer['Y2'])
 
 
 # .       .        _+_        .                  .             .

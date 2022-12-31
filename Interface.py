@@ -1286,14 +1286,13 @@ class Ui_window(object):
         self.progressBar.append(f'Maximum Value  -> {result["value"]}')
         self.progressBar.append(f'Best Chromosome -> {result["sloution"]}')
         self.progressBar.append(f'Items in the Bag -> {result["names"]}')
-        X = list(range(userInput['descendant']+1))
         Y_1 = result["Y1"]
         Y_2 = result["Y2"]
-        self.plot_canvas(X, Y_1, Y_2)
+        self.plot_canvas(Y_1, Y_2)
 
-    def plot_canvas(self, x_axis, y1_axis, y2_axis):
-
-        x_smooth = Kernel.linspace(0, max(x_axis), 100)
+    def plot_canvas(self, y1_axis, y2_axis):
+        x_axis = list(range(len(y1_axis)))
+        x_smooth = Kernel.linspace(0, x_axis[-1], 100)
         spl1 = make_interp_spline(x_axis, y1_axis)
         spl2 = make_interp_spline(x_axis, y2_axis)
         y1_smooth = spl1(x_smooth)
