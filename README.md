@@ -5,7 +5,7 @@ The modules used in the program are placed in the requirement file along with th
 You can easily install them with the following command :
 
 `pip install -r requirement.txt`
-## How to work
+## How Works?
 This program tries to optimize the contents of the backpack by using the genetic algorithm.
 In each section, a part of the algorithm is implemented, which is as follows:
 
@@ -53,3 +53,17 @@ This ‍`evaluation` finds the best chromosome of the generation and its value i
 At the end, after repeating the whole cycle above and progressing through the generations, a dictionary containing the best answer in all generations and the best answer in the last generation along with the average and the best value to display the graph, made.
 
 This dictionary is created by the `decorate_answer` function and is put into a variable called `result`. This variable is used to transfer information to the UI environment.
+
+# Example 
+Below is an example of running the program with the parameters given in the image = 
+```
+backpack capcity : 20
+population size : 50
+Repeat generation : 20
+Elitism : On
+etc...
+```
+
+![App window](https://user-images.githubusercontent.com/66873974/210139502-56788780-78da-4243-8188-35ae3c45f504.png)
+
+If you find a problem inside, please let me know and connect me 📧
