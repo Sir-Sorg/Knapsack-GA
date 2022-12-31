@@ -135,7 +135,9 @@ def calculate_probabilities(generation: list, stuff: list, available_weight: flo
     """
     allFitness = all_fitness(generation, stuff, available_weight)
     totalFitness = sum(f for f, c in allFitness)
-
+    if totalFitness == 0: # when we didt have any correct sloution
+        return []
+    
     # like 28 / 264 its eqaul --> (0.10 , [1,0,0,1,1,0,...])
     probabilities = [(fitness/totalFitness, chromosome)
                      for fitness, chromosome in allFitness]
@@ -425,7 +427,7 @@ def elitism(generation: list, stuff: list, available_weight: float):
     return elite
 
 
-def decorate(bestFitness: float, bestSloution: list, stuff: list, Y1: list, Y2: list):
+def decorate_answer(bestFitness: float, bestSloution: list, stuff: list, Y1: list, Y2: list):
     """Display the program solution information in a beautiful style
 
     Args:
@@ -537,6 +539,10 @@ def evolution(populationSize: int, mutationRate: float, selectionType: str, avai
     while descendant > 0:
         probabilities = calculate_probabilities(
             generation, stuff, availableWeight)
+        if not probabilities:
+            return {'value': 0,
+              'sloution': 'No solution found', 'Y1': [0 for i in range(descendant+1)], 'Y2': [0 for i in range(descendant+1)],'names':'Nothing'}
+            
         parents = selection(probabilities, selectionType)
         generation = crossover(populationSize, parents, crossoverType)
         generation = mutation(generation, mutationRate)
@@ -551,7 +557,7 @@ def evolution(populationSize: int, mutationRate: float, selectionType: str, avai
         descendant -= 1
 
     result = evaluation(generation, stuff, availableWeight)
-    result = decorate(result[0], result[1], stuff, Y_1, Y_2)
+    result = decorate_answer(result[0], result[1], stuff, Y_1, Y_2)
 
     return result
 
@@ -562,12 +568,11 @@ if __name__ == '__main__':
     descendant = 10
     populationSize = 100
     crossoverType = 'uniform-crossover'
-    answer = evolution(populationSize, 0.1, 'stochastic-universal-sampling-selection', availableWeight,
+    answer = evolution(populationSize, 0.1, 'roulette-wheel-selection', availableWeight,
                        descendant, crossoverType, True)
     print(answer)
     X = list(range(descendant+1))
     draw_plot(X, answer['Y1'], answer['Y2'])
-    
 
 
 # .       .        _+_        .                  .             .
