@@ -66,4 +66,4 @@ etc...
 
 ![App window](https://user-images.githubusercontent.com/66873974/210139502-56788780-78da-4243-8188-35ae3c45f504.png)
 
-If you find a problem inside, please let me know and connect me 📧
+If you have any questions or find a bug in the program, please contact me via email: *sinaorojlo53@gmail.com*.
