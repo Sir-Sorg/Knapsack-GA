@@ -541,16 +541,18 @@ def evolution(populationSize: int, mutationRate: float, selectionType: str, avai
             return {'value': 0,
                     'sloution': 'No solution found', 'maxValue': 0, 'maxSloution': 'No solution found', 'Y1': [0 for i in range(descendant+1)], 'Y2': [0 for i in range(descendant+1)], 'names': 'Nothing'}
 
-        generation=list()
+        # creating new generation
+        if haveElite:
+            elite = elitism(generation, stuff, availableWeight)
+            generation=[elite]
+        else:
+            generation.clear()
         for _ in range(populationSize):
             parents = selection(probabilities, selectionType)
             offspring = crossover(parents, crossoverType)
             generation.append(offspring)
         
         generation = mutation(generation, mutationRate)
-        if haveElite:
-            elite = elitism(generation, stuff, availableWeight)
-            generation.append(elite)
 
         result = evaluation(generation, stuff, availableWeight)
         if result[0] > maxSloution[0]:
@@ -574,7 +576,7 @@ if __name__ == '__main__':
     populationSize = 50
     crossoverType = 'single-point-crossover'
     answer = evolution(populationSize, 0.1, 'roulette-wheel-selection', availableWeight,
-                       descendant, crossoverType, False)
+                       descendant, crossoverType, True)
     print(answer)
     draw_plot(answer['Y1'], answer['Y2'])
 
