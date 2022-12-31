@@ -348,30 +348,26 @@ def uniform_crossover(parent: tuple):
     return Offspring
 
 
-def crossover(count: int, parents: tuple, crossoverType: str):
-    """generate new generation with specific count
+def crossover( parents: tuple, crossoverType: str):
+    """generate new offspring with specified parent
 
     Args:
-        count (int): number of member need in new generation
         parents (tuple): A tuple containing two list of parents
         crossoverType (str): Crossover type to produce offspring
         its can be: 'single-point-crossover', '2-point-crossover', '3-point-crossover', 'uniform-crossover'
 
     Returns:
-        list: new generation list
+        list: new chromosome
     """
-    generation = list()
-    for _ in range(count):
-        if crossoverType == 'single-point-crossover':
-            child = single_point_crossover(parents)
-        elif crossoverType == '2-point-crossover':
-            child = two_point_crossover(parents)
-        elif crossoverType == '3-point-crossover':
-            child = three_point_crossover(parents)
-        elif crossoverType == 'uniform-crossover':
-            child = uniform_crossover(parents)
-        generation.append(child)
-    return generation
+    if crossoverType == 'single-point-crossover':
+        child = single_point_crossover(parents)
+    elif crossoverType == '2-point-crossover':
+        child = two_point_crossover(parents)
+    elif crossoverType == '3-point-crossover':
+        child = three_point_crossover(parents)
+    elif crossoverType == 'uniform-crossover':
+        child = uniform_crossover(parents)
+    return child
 
 
 def mutation(chromosomes: list, chance=0.1):
@@ -525,13 +521,12 @@ def evolution(populationSize: int, mutationRate: float, selectionType: str, avai
         dict: Dictionary containing problem answer information
     """
 
-    # read and clean information from csv file
+    # read and clean information from csv file and make a list of things
     address = find_CSV()
     data = get_input(address)
     data = clean_data(data)
-
-    # make a list of things
     stuff = rebuilde_stuff(data)
+    
     generation = initial_population(populationSize, len(stuff))
     maxSloution = [0, []]
 
@@ -542,12 +537,16 @@ def evolution(populationSize: int, mutationRate: float, selectionType: str, avai
     while descendant > 0:
         probabilities = calculate_probabilities(
             generation, stuff, availableWeight)
-        if not probabilities:
+        if not probabilities: # if no sloution exist exit
             return {'value': 0,
                     'sloution': 'No solution found', 'maxValue': 0, 'maxSloution': 'No solution found', 'Y1': [0 for i in range(descendant+1)], 'Y2': [0 for i in range(descendant+1)], 'names': 'Nothing'}
 
-        parents = selection(probabilities, selectionType)
-        generation = crossover(populationSize, parents, crossoverType)
+        generation=list()
+        for _ in range(populationSize):
+            parents = selection(probabilities, selectionType)
+            offspring = crossover(parents, crossoverType)
+            generation.append(offspring)
+        
         generation = mutation(generation, mutationRate)
         if haveElite:
             elite = elitism(generation, stuff, availableWeight)
@@ -570,8 +569,7 @@ def evolution(populationSize: int, mutationRate: float, selectionType: str, avai
 
 # for my test ->
 if __name__ == '__main__':
-    #availableWeight = float(input('What is knopesack size (Kg): '))
-    availableWeight = 20
+    availableWeight = float(input('What is knopesack size (Kg): '))
     descendant = 50
     populationSize = 50
     crossoverType = 'single-point-crossover'
