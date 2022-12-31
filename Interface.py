@@ -1270,7 +1270,8 @@ class Ui_window(object):
             f'Selection Type -> {information["selectionType"]}')
         self.progressBar.append(
             f'Elitism -> {"On" if information["haveElite"] else "Off"}')
-        self.progressBar.append('=============================================')
+        self.progressBar.append(
+            '=============================================')
 
     def run_evolution(self):
         userInput = self.read_user_input()
@@ -1292,7 +1293,7 @@ class Ui_window(object):
 
     def plot_canvas(self, y1_axis, y2_axis):
         x_axis = list(range(len(y1_axis)))
-        x_smooth = Kernel.linspace(0, x_axis[-1], 100)
+        x_smooth = Kernel.linspace(0, x_axis[-1], len(x_axis)*10)
         spl1 = make_interp_spline(x_axis, y1_axis)
         spl2 = make_interp_spline(x_axis, y2_axis)
         y1_smooth = spl1(x_smooth)
@@ -1305,7 +1306,7 @@ class Ui_window(object):
         plter.set(xlabel='Number of Generations',
                   ylabel='fitness of Generation')
         plter.grid(linestyle='--', linewidth=0.5)
-        plter.legend(['Avrage', 'Sloution'], loc="lower left")
+        plter.legend(['Avrage', 'Best'], loc="lower left")
         plter.set_facecolor('#292826')
         self.canvas.draw()
 

@@ -491,7 +491,7 @@ def draw_plot(y1_axis: list, y2_axis: list):
         y2_axis (list): Coordinates of the points of the best solution on the axis
     """
     x_axis = list(range(len(y1_axis)))
-    x_smooth = linspace(0, x_axis[-1], 100)
+    x_smooth = linspace(0, x_axis[-1], len(x_axis)*10)
     spl1 = make_interp_spline(x_axis, y1_axis)
     spl2 = make_interp_spline(x_axis, y2_axis)
     y1_smooth = spl1(x_smooth)
@@ -502,7 +502,7 @@ def draw_plot(y1_axis: list, y2_axis: list):
     plt.xlabel('Number of Generations')
     plt.ylabel('fitness of Generation')
     plt.grid(linestyle='--', linewidth=0.5)
-    plt.legend(['Avrage', 'Sloution'])
+    plt.legend(['Avrage', 'Best'])
 
     plt.show()
 
