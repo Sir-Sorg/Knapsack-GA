@@ -565,9 +565,9 @@ def evolution(populationSize: int, mutationRate: float, selectionType: str, avai
 # for my test ->
 if __name__ == '__main__':
     #availableWeight = float(input('What is knopesack size (Kg): '))
-    availableWeight = 750
-    descendant = 100
-    populationSize = 10
+    availableWeight = 20
+    descendant = 50
+    populationSize = 50
     crossoverType = 'single-point-crossover'
     answer = evolution(populationSize, 0.1, 'roulette-wheel-selection', availableWeight,
                        descendant, crossoverType, False)
