@@ -39,3 +39,17 @@ Here we have four ways to Producing a new child :
 - Uniform Crossover
 
 By repeating the **selection and crossover** stage, you get the number of population of a new generation with the specified population.
+
+### Mutation 🔬
+Using the `mutation` function, we perform the mutation operation on each chromosome of the current generation, which is a simple way to change a gene from 0 to 1 or 1 to 0. It is done to each genes of a chromosome.
+
+### Elitism 👑
+With this mode active, the ‍‍`elitism` function finds the best chromosome in the current generation and directly transfers it to the next generation.
+
+### Evaluation 🔎
+This ‍`evaluation` finds the best chromosome of the generation and its value in each generation.
+
+### Display the final output 📈
+At the end, after repeating the whole cycle above and progressing through the generations, a dictionary containing the best answer in all generations and the best answer in the last generation along with the average and the best value to display the graph, made.
+
+This dictionary is created by the `decorate_answer` function and is put into a variable called `result`. This variable is used to transfer information to the UI environment.
